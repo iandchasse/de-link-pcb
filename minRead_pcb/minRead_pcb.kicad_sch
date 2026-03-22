@@ -10383,6 +10383,12 @@
 		(uuid "67d044f9-974c-4b5b-b125-6f38b654c244")
 	)
 	(junction
+		(at 285.75 284.48)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "680c0936-8ab8-485e-9de6-28835f44d66f")
+	)
+	(junction
 		(at 148.59 323.85)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -10894,6 +10900,16 @@
 	)
 	(wire
 		(pts
+			(xy 52.07 30.48) (xy 48.26 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f6de27c-9872-4309-9eb4-69a65f5f5490")
+	)
+	(wire
+		(pts
 			(xy 148.59 323.85) (xy 115.57 323.85)
 		)
 		(stroke
@@ -11131,16 +11147,6 @@
 			(type default)
 		)
 		(uuid "20b03c13-7968-4e5f-a6e8-3a4308206833")
-	)
-	(wire
-		(pts
-			(xy 73.66 156.21) (xy 76.2 156.21)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2147d259-ec21-411b-ad23-a58375d71b3b")
 	)
 	(wire
 		(pts
@@ -11804,7 +11810,7 @@
 	)
 	(wire
 		(pts
-			(xy 55.88 30.48) (xy 62.23 30.48)
+			(xy 59.69 30.48) (xy 62.23 30.48)
 		)
 		(stroke
 			(width 0)
@@ -12011,6 +12017,16 @@
 			(type default)
 		)
 		(uuid "631046ed-09f8-4450-a1aa-a79536679501")
+	)
+	(wire
+		(pts
+			(xy 285.75 284.48) (xy 287.02 284.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "63eba136-4a71-4c2c-af46-a8be0497bcb1")
 	)
 	(wire
 		(pts
@@ -13194,7 +13210,7 @@
 	)
 	(wire
 		(pts
-			(xy 284.48 284.48) (xy 287.02 284.48)
+			(xy 284.48 284.48) (xy 285.75 284.48)
 		)
 		(stroke
 			(width 0)
@@ -13414,7 +13430,7 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 156.21) (xy 66.04 156.21)
+			(xy 62.23 156.21) (xy 76.2 156.21)
 		)
 		(stroke
 			(width 0)
@@ -13952,6 +13968,16 @@
 		)
 		(uuid "68e00a45-adbc-4e94-8787-ca98215b97ad")
 	)
+	(label "VBUS_PRE"
+		(at 49.53 30.48 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6e129d06-9e3a-4ce4-8810-735638fc33c2")
+	)
 	(label "PREVGL"
 		(at 49.53 313.69 0)
 		(effects
@@ -14021,6 +14047,16 @@
 			(justify right bottom)
 		)
 		(uuid "bcfffd87-7bf1-4610-a995-11dcb3a0816e")
+	)
+	(label "VBUS_PRE"
+		(at 36.83 121.92 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bf368558-0f04-4f77-9bb6-dd8584aa87a7")
 	)
 	(label "CMD"
 		(at 439.42 83.82 180)
@@ -15401,28 +15437,6 @@
 		(uuid "7c339f34-beac-4f77-be0c-eb334ea5cda1")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 444.962 48.26 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "USB_VBUS"
-		(shape input)
-		(at 36.83 121.92 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "7cb5a130-6e60-4365-85f3-2d40194ac6db")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 24.1686 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18066,7 +18080,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "0.1u"
+		(property "Value" "1u"
 			(at 196.85 105.4099 0)
 			(effects
 				(font
@@ -18729,6 +18743,72 @@
 			(project "minRead_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR024")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 285.75 284.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2bb45e66-451f-4d53-bd27-60910a139ea3")
+		(property "Reference" "#FLG05"
+			(at 285.75 282.575 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 285.75 279.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 285.75 284.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 285.75 284.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 285.75 284.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "00ea6581-337f-4bfd-8f1b-155d3eef055a")
+		)
+		(instances
+			(project "minRead_pcb"
+				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
+					(reference "#FLG05")
 					(unit 1)
 				)
 			)
@@ -21179,7 +21259,7 @@
 				)
 			)
 		)
-		(property "Value" "1u"
+		(property "Value" "4.7u"
 			(at 340.614 270.51 90)
 			(effects
 				(font
@@ -21997,7 +22077,7 @@
 	)
 	(symbol
 		(lib_id "Diode:MBR0530")
-		(at 52.07 30.48 180)
+		(at 55.88 30.48 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -22006,7 +22086,7 @@
 		(fields_autoplaced yes)
 		(uuid "702dacbe-804f-473d-a417-9edafad76c0d")
 		(property "Reference" "D1"
-			(at 52.3875 24.13 0)
+			(at 56.1975 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22014,7 +22094,7 @@
 			)
 		)
 		(property "Value" "MBR0530"
-			(at 52.3875 26.67 0)
+			(at 56.1975 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22022,7 +22102,7 @@
 			)
 		)
 		(property "Footprint" "Diode_SMD:D_SOD-123"
-			(at 52.07 26.035 0)
+			(at 55.88 26.035 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22031,7 +22111,7 @@
 			)
 		)
 		(property "Datasheet" "http://www.mccsemi.com/up_pdf/MBR0520~MBR0580(SOD123).pdf"
-			(at 52.07 30.48 0)
+			(at 55.88 30.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22040,7 +22120,7 @@
 			)
 		)
 		(property "Description" "30V 0.5A Schottky Power Rectifier Diode, SOD-123"
-			(at 52.07 30.48 0)
+			(at 55.88 30.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23901,73 +23981,6 @@
 			(project "minRead_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R11")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 69.85 156.21 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "92c4308e-dd2c-4ada-a97a-92fe914450e4")
-		(property "Reference" "R17"
-			(at 69.85 149.86 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "100"
-			(at 69.85 152.4 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 69.85 157.988 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 69.85 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 69.85 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "98b40482-e0eb-4b87-99c3-77c6b35bf0d4")
-		)
-		(pin "2"
-			(uuid "d94f7403-d787-4560-b538-85c6093d6fff")
-		)
-		(instances
-			(project "minRead_pcb"
-				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
-					(reference "R17")
 					(unit 1)
 				)
 			)

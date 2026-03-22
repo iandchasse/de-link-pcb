@@ -1,0 +1,19 @@
+LTspice 26.0.1 for Windows
+Circuit: C:\Users\iandc\Documents\PlatformIO\Projects\EPD_Hub_ESP32\minRead_pcb\minRead_pcb\LED_circuit.net
+Start Time: Mon Jan 26 11:42:01 2026
+solver = Normal
+Maximum thread count: 24
+tnom = 27
+temp = 27
+method = trap
+Direct Newton iteration succeeded in finding operating point.
+
+Simulation stopped by user.
+Total elapsed time: 3.515 seconds.
+
+Files loaded:
+C:\Users\iandc\Documents\PlatformIO\Projects\EPD_Hub_ESP32\minRead_pcb\minRead_pcb\LED_circuit.net
+C:\Users\iandc\AppData\Local\LTspice\lib\cmp\standard.dio
+C:\Users\iandc\AppData\Local\LTspice\lib\cmp\standard.bjt
+C:\Users\iandc\AppData\Local\LTspice\lib\sub\LT1615.sub
+
