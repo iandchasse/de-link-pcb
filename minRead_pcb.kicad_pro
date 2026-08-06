@@ -52,12 +52,7 @@
         }
       },
       "diff_pair_dimensions": [],
-      "drc_exclusions": [
-        [
-          "solder_mask_bridge|67887462|126900000|7457c246-1656-46ee-8f6d-52f1d52e72a4|23aea637-07ca-43b2-a7c5-de10495b7d4d",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -689,7 +684,7 @@
       "plot": "gerbers/",
       "pos_files": "placement/",
       "specctra_dsn": "",
-      "step": "delink_pcb_0705.step",
+      "step": "delink_pcb_0806.step",
       "svg": "",
       "vrml": ""
     },
