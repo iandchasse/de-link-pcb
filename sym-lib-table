@@ -13,5 +13,5 @@
   (lib (name "TPD6E004RSER")(type "KiCad")(uri "${KIPRJMOD}/KiCad/9.0/3rdparty/TPD6E004RSER/TPD6E004RSER.kicad_sym")(options "")(descr ""))
   (lib (name "TSD05CDYFR")(type "KiCad")(uri "${KIPRJMOD}/KiCad/9.0/3rdparty/TSD05CDYFR/KiCADv6/2025-12-14_19-02-00.kicad_sym")(options "")(descr ""))
   (lib (name "mjtp117")(type "KiCad")(uri "${KIPRJMOD}/KiCad/9.0/3rdparty/Mjtp1117/MJTP1117.kicad_sym")(options "")(descr ""))
-  (lib (name "AP3031")(type "KiCad")(uri "${KIPRJMOD}/KiCad/9.0/3rdparty/AP3031.kicad_sym")(options "")(descr ""))
+  (lib (name "TPS923610DRLR")(type "KiCad")(uri "${KIPRJMOD}/KiCad/9.0/3rdparty/TPS923610DRLR/KiCADv6/2026-09-06_02-10-40.kicad_sym")(options "")(descr ""))
 )
