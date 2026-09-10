@@ -389,57 +389,53 @@ four things land exactly where this board already expects them:
 
 So power, reset, USB and the serial console all survive the swap untouched.
 
-**Electrically, it is not a drop-in — but it is closer than you would expect.** Pins 4–35, 38
-and 39 keep their *positions* but change their *GPIO numbers*, which is only a firmware
-concern. Three hardware issues are real:
+**Electrically, it is not a drop-in — and the gap is structural.** Pins 4–35, 38 and 39 keep
+their *positions* but change their *GPIO numbers*, which is only a firmware concern. Two
+hardware issues are not:
 
-**1. Three of the five analog signals land on pins with no ADC.** The S31 concentrates its ADC
-channels on pins 28–35, 38 and 39 (as differential `ADC1_CH0_N/P` … pairs):
+**1. The ADC1 pin sets are disjoint.** ADC2 is unusable while Wi-Fi is active on both parts, so
+only ADC1 counts:
 
-| Board signal | Pin | S31 GPIO | ADC? |
-|---|---:|---|---|
-| `BUTTON_ADC_1` | 39 | IO57 | ✅ ADC2_CH3_P |
-| `USB_STAT` | 38 | IO56 | ✅ ADC2_CH3_N |
-| `BUTTON_ADC_2` | 4 | IO2 | ❌ **none** |
-| `BAT_MONIT` | 12 | IO35 | ❌ **none** |
-| `LED_MONIT` | 17 | IO22 | ❌ **none** |
+| Part | ADC1 GPIOs | Physical perimeter pins |
+|---|---|---|
+| ESP32-S3 | GPIO1–GPIO10 | 4, 5, 6, 7, 12, 15, 17, 18, 38, 39 |
+| ESP32-S31 | GPIO42–GPIO49 | 28, 29, 30, 31, 32, 33 (+ inner pads 56, 57) |
 
-The second button ladder, the battery gauge and the frontlight monitor would all need
-rerouting to pins 28–35.
+**No physical pin offers ADC1 on both parts.** Taken alone the S31 is fine — its six perimeter
+ADC1 pins comfortably cover this board's five analog nets, and the `_N`/`_P` suffixes denote
+optional differential pairing rather than a requirement. But pins 28–33 currently carry the
+three test points, `I2C_SDA`, `I2C_SCL` and `PWM_LED`, and on an S3 those same pins are
+`IO35`–`IO40` — none ADC-capable. Serving both would take ten 0 Ω select jumpers plus dual
+routing for the displaced signals.
 
-**2. Four strapping pins are hit**, because the S31 moves its straps to `GPIO36`, `GPIO37`,
-`GPIO60` and `GPIO61`:
-
-| Pin | Board net | S31 strap | Consequence |
-|---:|---|---|---|
-| 21 | `SPI_SCK` | `IO36` — VDD_SPI voltage | Module pulls it up internally; SPI must not sit low through the 3 ms strap window |
-| 22 | `EPD_CS` | `IO37` — JTAG source | Defaults *floating* and must be externally driven — the board has no pull here |
-| 26 | `UNUSED_GPIO_45` | `IO60` — boot mode + ROM print | Exposed on `J6` pin 3; a user pulling it low changes boot behaviour |
-| 27 | `ESP32_IO0` | `IO61` — boot mode | **Still works** — see below |
-
-The boot button is a happy accident. The S31 enters download mode with `GPIO61 = 0` and
-`GPIO60 = 1`; `SW6` pulls pin 27 (`IO61`) low and `IO60` defaults to a weak pull-up, so
-**`SW6` still selects download boot**. The caveat is that `GPIO61 = 0` *and* `GPIO60 = 0`
-is documented as invalid, and `IO60` is reachable from the expansion header.
+**2. The SD bus is on the wrong pins.** The S31's SD/MMC host is documented for **IO MUX only** —
+*"card one can use GPIO20–GPIO25 via IO MUX, and card two can use GPIO35–GPIO40 via IO MUX"* —
+with no GPIO Matrix escape hatch (unlike UART and SPI, where the datasheet says so explicitly).
+That means module pins 15–20 or 12/21–25. This board's SD bus sits on pins 5–10.
 
 **3. The centre of the footprint differs.** The S3-WROOM-1 has a single large thermal/ground
 pad — on this board, a 3.90 × 3.90 mm GND pad. The S31 instead places **20 signal pads
-(0.4 × 0.8 mm) and 9 ground pads (0.9 × 0.9 mm)** in that same central area, carrying `IO8`–
-`IO19`, `DM`/`DP` (the High-Speed USB OTG pair) and `IO48`–`IO53`.
+(0.4 × 0.8 mm) and 9 ground pads (0.9 × 0.9 mm)** in that area, carrying `IO8`–`IO19`,
+`DM`/`DP` (the High-Speed USB OTG pair) and `IO48`–`IO53`. Those extra IO are optional, but the
+board's solid GND pad sits directly beneath them, so soldering an S31 to the unmodified
+footprint risks shorting them to ground.
 
-Those extra IO are optional — nothing forces you to connect them — but the board's solid GND
-pad sits directly beneath them. **Soldering an S31 onto the unmodified footprint risks shorting
-those signal pads to ground.** A future revision should shrink or split that centre pad; a
-one-off experiment should at minimum leave it unpasted.
+Four strapping pins also move (`IO36`, `IO37`, `IO60`, `IO61` at pins 21, 22, 26, 27). The boot
+button happens to survive: download boot needs `GPIO61 = 0` with `GPIO60 = 1`, and `SW6` pulling
+pin 27 low against `IO60`'s internal pull-up gives exactly that.
 
-**Summary:** the S31-WROOM-1 is main-pin compatible and would power up, program and talk over
-USB and UART on this board. Full functionality needs a footprint tweak for the centre pad and
-three analog nets rerouted — a board revision, not a substitution. What it would buy is
-substantial: **Wi-Fi 6** (with TWT for far cheaper connected standby), **Bluetooth 5.4 LE +
-Classic**, **802.15.4** (Thread/Zigbee/Matter), a dual-core **RISC-V at 320 MHz**, a **low-power
-coprocessor** that can run while the main cores sleep, **16 MB of PSRAM that costs no GPIO**,
-**54 GPIOs**, USB **High-Speed** OTG, and a differential ADC. For an e-reader the standouts are
-the PSRAM, the LP core and TWT; the Ethernet MAC, CAN FD and 320 MHz dual-core are dead weight.
+**Conclusion: S31 compatibility is not a design goal for this board.** The pin maps diverge too
+far to bridge economically. `TP3`/`TP4`/`TP5` remain worth having for the immediate benefit they
+already provide on non-octal S3 variants (`N4`/`N8`/`N16`/`R2`). If the S31 ever becomes
+compelling it is a fresh board revision — and a tidy one, since the S31's own grouping is
+favourable: SD on pins 15–20, analog on 28–33.
+
+What such a board would gain: **Wi-Fi 6** (with TWT for far cheaper connected standby),
+**Bluetooth 5.4 LE + Classic**, **802.15.4** (Thread/Zigbee/Matter), a dual-core **RISC-V at
+320 MHz**, a **low-power coprocessor** that runs while the main cores sleep, **16 MB of PSRAM
+that costs no GPIO**, **54 GPIOs**, USB **High-Speed** OTG, and a differential ADC. For an
+e-reader the standouts are the PSRAM, the LP core and TWT; the Ethernet MAC, CAN FD and
+320 MHz dual-core are dead weight.
 
 *(Datasheet status: Pre-release v0.1, marked CONFIDENTIAL. Treat all of the above as
 provisional until Espressif publishes a public release.)*

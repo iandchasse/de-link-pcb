@@ -925,7 +925,7 @@ There is a real trade here and it should be resolved with a measurement rather t
 ### 6.18 🟡 **NEW** — what an ESP32-S31-WROOM-1 swap would actually require
 
 Verified against the **ESP32-S31-WROOM-1 Datasheet, Pre-release v0.1** (Table 3-1 pin
-definitions, Table 4-3 boot mode, Figure 9-1 dimensions).
+definitions, Table 4-3 boot mode, §5.2.2.10 SDHOST, §5.2.3.3 ADC, Figure 9-1 dimensions).
 
 **Correction to an earlier draft of this review:** I previously stated the S31-WROOM-1 was not
 footprint-compatible, based on the published *WROOM-3* datasheet (99 pins) and Espressif's
@@ -933,43 +933,68 @@ product table. **That was wrong.** The S31-WROOM-1 is **18.0 × 25.5 × 3.1 mm w
 castellated pads on a 1.27 mm pitch** — the same main-pin layout as the S3-WROOM-1. Power
 (1, 2), `EN` (3), USB (13/14) and UART0 (36/37) all land on identical pins.
 
-Three things would still need attention before an S31 could be fitted:
+#### The blocker: ADC1 pin sets are disjoint
 
-**1. 🔴 Centre-pad short risk.** `U4`'s footprint (`RF_Module:ESP32-S3-WROOM-1`) has pad 41 as a
-single **3.90 × 3.90 mm GND** pad. The S31 puts **20 signal pads (0.4 × 0.8 mm) + 9 GND pads
-(0.9 × 0.9 mm)** in that area, carrying `IO8`–`IO19`, `DM`/`DP` and `IO48`–`IO53`. Soldering an
-S31 to the unmodified footprint would likely **short several GPIO to ground**. A dual-support
-footprint would need that centre pad shrunk or split.
+**ADC2 is unusable while Wi-Fi is active on both parts**, so only ADC1 counts. Mapping each
+part's ADC1 GPIOs onto physical module pins:
 
-**2. 🔴 Three analog nets lose their ADC.** The S31 groups ADC channels on pins 28–35, 38, 39:
+| Part | ADC1 GPIOs | Physical perimeter pins |
+|---|---|---|
+| ESP32-S3 | GPIO1–GPIO10 | **4, 5, 6, 7, 12, 15, 17, 18, 38, 39** |
+| ESP32-S31 | GPIO42–GPIO49 | **28, 29, 30, 31, 32, 33** (+ inner pads 56, 57) |
 
-| Net | Pin | S31 GPIO | ADC |
-|---|---:|---|---|
-| `BUTTON_ADC_1` | 39 | IO57 | ✅ ADC2_CH3_P |
-| `USB_STAT` | 38 | IO56 | ✅ ADC2_CH3_N |
-| `BUTTON_ADC_2` | 4 | IO2 | ❌ |
-| `BAT_MONIT` | 12 | IO35 | ❌ |
-| `LED_MONIT` | 17 | IO22 | ❌ |
+**The intersection is empty.** There is not one physical pin that offers ADC1 on both parts, so
+**no single pin assignment can serve both** — this is a hard result, not a tuning problem.
 
-Interesting side note: the pins this board currently spends on `UNUSED_GPIO_3/46`, `LED_MONIT`,
-`TP_INT`, `TP_RST` and `SPI_MOSI` (15–20) are exactly the S31's **dedicated SDIO block**
-(`SDIO_DATA0-3`, `SDIO_CLK`, `SDIO_CMD`). A board intended for both parts would want the SD bus
-moved there.
+Good news on the S31 side taken alone: §5.2.3.3 says each SAR ADC measures *"analog signals
+from up to eight pins"*, so the `_N`/`_P` suffixes denote optional differential pairing, not a
+requirement. Six single-ended ADC1 inputs on pins 28–33 comfortably covers this board's five
+analog nets. An **S31-only** board is perfectly feasible.
 
-**3. 🟡 Four strapping pins are touched.** `IO36` (pin 21, `SPI_SCK`) is the VDD_SPI strap —
-internally pulled up in the module, but SPI must not sit low through the 3 ms hold window.
-`IO37` (pin 22, `EPD_CS`) is the JTAG-source strap, defaults **floating**, and per the SoC
-datasheet must be externally driven — the board has no pull on `EPD_CS`. `IO60` (pin 26) is a
-boot strap and is exposed on `J6` pin 3.
+But pins 28–33 currently carry `TP5`/`TP4`/`TP3`, `I2C_SDA`, `I2C_SCL` and `PWM_LED` — and on
+an S3 those pins are `IO35`–`IO40`, none of which are ADC-capable (and `IO35/36/37` are the
+octal-PSRAM pins on `R8` parts). So the analog cannot simply be moved there and left alone.
 
-**The boot button survives by luck.** Download boot needs `GPIO61 = 0, GPIO60 = 1`; `SW6` pulls
-pin 27 (`IO61`) low and `IO60` defaults to a weak pull-up, so `SW6` still works. But
-`GPIO61 = 0` *with* `GPIO60 = 0` is documented as invalid, and `IO60` is reachable from the
-header — worth a pull-up if dual support is ever a goal.
+Supporting both parts would mean bringing all five analog nets to **two** pins each with 0 Ω
+select jumpers — ten resistors, plus dual routing for the five signals displaced from pins
+28–33 — on a board whose stated goal is to be cheap and easy to understand. **Not worth it.**
 
-**No action required for the current board.** The `TP3`/`TP4`/`TP5` pads remain correct and
-useful for non-octal S3 builds. This is scoped for a future revision, and the datasheet is
-still pre-release/CONFIDENTIAL.
+#### The SD bus would also need moving
+
+§5.2.2.10: *"For the SD/SDIO/MMC host controller, card one can use GPIO20–GPIO25 via IO MUX,
+and card two can use GPIO35–GPIO40 via IO MUX."* Note the datasheet mentions **only IO MUX**
+here, in contrast to UART (§5.2.2.1: *"They also support mapping to other pins through the GPIO
+Matrix"*) and UART1-3 (*"routed to any HP GPIO pins via the GPIO Matrix"*). SDHOST should
+therefore be treated as **fixed to those two pin groups**, not freely mux-able.
+
+On the module that means card 1 = pins 15–20 and card 2 = pins 12, 21–25. This board's SD bus
+is on pins 5–10, which is neither group. (Ironically, pins 15–20 currently carry
+`UNUSED_GPIO_3/46`, `LED_MONIT`, `TP_INT`, `TP_RST` and `SPI_MOSI` — an S31-targeted layout
+would put the SD bus exactly there.)
+
+#### Other differences, for completeness
+
+* **Centre pad.** `U4`'s footprint has pad 41 as a single **3.90 × 3.90 mm GND** pad. The S31
+  puts **20 signal pads (0.4 × 0.8 mm) + 9 GND pads (0.9 × 0.9 mm)** there, carrying `IO8`–
+  `IO19`, `DM`/`DP` and `IO48`–`IO53`. Soldering an S31 to the unmodified footprint risks
+  shorting those to ground.
+* **Four strapping pins move**: `IO36` (pin 21, `SPI_SCK`, VDD_SPI strap, internally pulled up),
+  `IO37` (pin 22, `EPD_CS`, JTAG strap, defaults floating and must be driven), `IO60` (pin 26,
+  boot strap, exposed on `J6`), `IO61` (pin 27). The boot button survives by luck — download
+  boot needs `GPIO61 = 0, GPIO60 = 1`, and `SW6` plus `IO60`'s internal pull-up gives exactly
+  that.
+
+#### Recommendation: drop S31 compatibility as a goal
+
+The pin maps diverge too far. **Keep `TP3`/`TP4`/`TP5`** — they remain genuinely useful on
+non-octal S3 variants (`N4`/`N8`/`N16`/`R2`), which is a real and immediate benefit.
+
+**Reword the schematic note**, though. It currently reads *"ESP32-S31-WROOM-1 does not reserve
+GPIO for PSRAM. Future proofing :)"*, which implies a drop-in path that does not exist. Better:
+*"IO35–37: free GPIO on non-octal-PSRAM S3 variants (N4/N8/N16/R2); do not connect on R8."*
+
+If the S31 ever becomes compelling, it is a **new board revision** — and a clean one, since the
+S31's own pin grouping is quite favourable (SD on pins 15–20, analog on 28–33).
 
 ### 6.19 Smaller observations
 
