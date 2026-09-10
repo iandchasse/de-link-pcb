@@ -508,6 +508,13 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 27d | **Bleed `R77` = 100 k on `SD_VDD`** | 33 µA idle; 396 ms discharge, or 7.9 ms with SD lines driven low |
 | 27e | **Gate `R78` = 1 k from `IO41`, `R40` 100 k on the FET side** | Vgs = −3.27 V on / 0 V off. R40 placement verified correct |
 | 27f | **`C37` 4.7 µF → 1 µF** | Inrush 19.1 → 6.93 µC; 3V3 dip **375 → 136 mV**. Replaced the need for a gate cap |
+| 5 | **`TPS923610` symbol GND → `power_input`** | **ERC now 0 errors** (was 4) |
+| 33 | **`#FLG05` removed from `LDO_IN`; PWR_FLAG added to `SD_VDD`** | Cleared both new ERC errors |
+| 21 | **`/50V` appended to `C13`–`C17`, `C20` values** | Now visible in the JLC `Comment` column |
+| 14 | **`J6` re-ordered — fuller fix applied** | `4=GND, 8=SDA, 12=P+`. `LED_SW` now bounded only by GND/W−/C−; `P+` cornered by the LED returns |
+| 31 | **`L1` → `VLS3012HBX-220M`** | Metal-composite, 1.2 mm tall, dual-sourced |
+| 2 | **`J2` symbol pin names corrected** | pin 4 now `NC`; VGH/VGL/VSH/VSL now read correctly |
+| 34 | **Stale `Switchover at ~4.1V` note → `~3.4V`** | Matches `R38` = 240 k |
 | 4 | **LED note corrected** | now reads `10kHz-25kHz` and `0-24.5V` |
 | 31a | **`L1` replacement chosen: `VLS3012HBX-220M`** | annotated on the sheet (see ⚠️ below about where it needs to go) |
 | 21a | **50 V annotated on `C13`–`C17`, `C20`, `C9`** | text placed beside each cap (see ⚠️ below) |
@@ -522,13 +529,6 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 
 | # | Change | Why it still matters |
 |---|---|---|
-| **32** | 🟡 **Voltage ratings in the `Value` field** (`4.7u/50V`) — your chosen approach ✔ | The `Value` field exports to the `Comment` column of the JLC BOM, so it *is* visible when you match parts. Sufficient **provided you match parts manually** and don't let an auto-matcher pick the cheapest 0805. The `LCSC` column stays empty (all 160 rows) — acceptable given the plugin isn't native and doesn't work well for you |
-| **33** | ⚠️ **ERC regression: 4 errors now, was 1.** Remove `#FLG05` from `LDO_IN`; add a PWR_FLAG on `SD_VDD` | Both are side-effects of the good changes — see §4 |
-| **5** | **Fix the `TPS923610` symbol: `GND` pin type → `power_input`** | Still the 3rd ERC error |
-| **21** | **Append `/50V` to the `Value` of `C13`–`C17`, `C20`** (the sheet text alone is invisible to the BOM) | Puts it in the `Comment` column so you see it when matching parts at JLC |
-| **31** | **`L1` = `VLS3012HBX-220M` chosen ✅** — consider putting the MPN in `Value` or the existing `MP` field too | LCSC `C350879` if you want the JLC line; sheet text alone doesn't reach the BOM |
-| **15** | **Delete `Q7`+`R40`; tie `U10.VIN` to `LDO_IN`; control via ADIM only** | I_SD = 130 nA. Fixes the LDO thermal cliff, removes the level-shift problem, frees the switch for the SD |
-| **27** | **microSD gating: move `R8/R9/R53/R54/R55` + `C36/C37` to switched `SD_VDD`**, add 10 k bleed + 10 k gate resistor, drive on **IO41** | Pull-ups on unswitched 3V3 will phantom-power the card and defeat the gating entirely |
 
 **Should do:**
 
@@ -854,7 +854,28 @@ The `TPD4E1U06` arrays (`U1`, `U9`) are *not* a problem — they are supply-less
 
 **Alternative worth pricing:** a dedicated load switch (e.g. TPS22918, SOT-23-6) gives you controlled slew rate *and* an integrated output discharge in one part, replacing the FET + pull-up + gate resistor + bleed resistor. Similar cost, fewer things to get wrong.
 
-### 6.16 Smaller observations
+### 6.16 🟢 **NEW (from the documentation pass)** — `LED_MONIT` does not read 0 V when the frontlight is off
+
+Not a defect — a firmware-facing behaviour worth writing down, found while documenting §7 of [`docs/HARDWARE.md`](docs/HARDWARE.md).
+
+A boost converter always has a DC path from input to output: `LDO_IN → L2 → SW → HS-FET body diode → VOUT`. With `U10` disabled (`ADIM` low), `LED_SW` therefore settles at roughly `LDO_IN − 0.7 V`, **not** 0 V, and the `R39`/`R41` divider reports it:
+
+| `LDO_IN` | `LED_SW` (off) | `LED_MONIT` reads | divider draw |
+|---:|---:|---:|---:|
+| 5.0 V (USB) | ~4.30 V | **0.461 V** | 3.8 µA |
+| 4.2 V (full cell) | ~3.50 V | **0.375 V** | 3.1 µA |
+| 3.7 V (nominal) | ~3.00 V | **0.321 V** | 2.7 µA |
+| 3.0 V (empty) | ~2.30 V | **0.246 V** | 2.1 µA |
+
+Three consequences:
+
+1. **Firmware must not treat ~0.25–0.46 V as a fault.** That *is* the healthy off state. A "boost failed to start" check should look for a reading that stays low after `ADIM` has been high for >40 µs, not for a low reading per se. Note the off-state value tracks the battery, so the threshold should be relative to `BAT_MONIT`, not absolute.
+2. **The divider draws 2–4 µA continuously**, even with the frontlight off, because `LED_SW` is never actually at 0 V. That is a real (small) contributor to the standby budget, and it cannot be removed without gating the boost input.
+3. **No glow.** The LED string sees at most ~4.3 V against a ~15 V forward voltage, so nothing lights. ✔ (This is also why the string can be safely left connected.)
+
+If the standby 2–4 µA ever matters, the fix is the same load switch discussed in §6.14 — but at 2–4 µA against a ~95 µA budget it is not currently worth a part.
+
+### 6.17 Smaller observations
 
 * **`R14` (3 Ω, 0805) — concern WITHDRAWN.** My 120 mW figure assumed 200 mA *continuously*; `R14` only conducts while `Q4` is on, and the current is a rising triangle. `I_rms = I_pk·√(D/3)` gives 63–97 mA over D = 0.3–0.7, so **P = 12–28 mW**, i.e. 10–22 % of an 0805's 125 mW. Comfortable. No action.
 * **`C7` (0.1 µF, P+ → B−)** is correctly the DW01A's datasheet `C1` (VCC-to-GND, where the IC's GND *is* B−). ✔ This is right and easy to mistake for an error — worth a schematic note so a future reviewer doesn't "fix" it.
