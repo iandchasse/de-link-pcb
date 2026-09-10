@@ -922,7 +922,56 @@ should be small.
 
 There is a real trade here and it should be resolved with a measurement rather than a default.
 
-### 6.18 Smaller observations
+### 6.18 🟡 **NEW** — what an ESP32-S31-WROOM-1 swap would actually require
+
+Verified against the **ESP32-S31-WROOM-1 Datasheet, Pre-release v0.1** (Table 3-1 pin
+definitions, Table 4-3 boot mode, Figure 9-1 dimensions).
+
+**Correction to an earlier draft of this review:** I previously stated the S31-WROOM-1 was not
+footprint-compatible, based on the published *WROOM-3* datasheet (99 pins) and Espressif's
+product table. **That was wrong.** The S31-WROOM-1 is **18.0 × 25.5 × 3.1 mm with 40
+castellated pads on a 1.27 mm pitch** — the same main-pin layout as the S3-WROOM-1. Power
+(1, 2), `EN` (3), USB (13/14) and UART0 (36/37) all land on identical pins.
+
+Three things would still need attention before an S31 could be fitted:
+
+**1. 🔴 Centre-pad short risk.** `U4`'s footprint (`RF_Module:ESP32-S3-WROOM-1`) has pad 41 as a
+single **3.90 × 3.90 mm GND** pad. The S31 puts **20 signal pads (0.4 × 0.8 mm) + 9 GND pads
+(0.9 × 0.9 mm)** in that area, carrying `IO8`–`IO19`, `DM`/`DP` and `IO48`–`IO53`. Soldering an
+S31 to the unmodified footprint would likely **short several GPIO to ground**. A dual-support
+footprint would need that centre pad shrunk or split.
+
+**2. 🔴 Three analog nets lose their ADC.** The S31 groups ADC channels on pins 28–35, 38, 39:
+
+| Net | Pin | S31 GPIO | ADC |
+|---|---:|---|---|
+| `BUTTON_ADC_1` | 39 | IO57 | ✅ ADC2_CH3_P |
+| `USB_STAT` | 38 | IO56 | ✅ ADC2_CH3_N |
+| `BUTTON_ADC_2` | 4 | IO2 | ❌ |
+| `BAT_MONIT` | 12 | IO35 | ❌ |
+| `LED_MONIT` | 17 | IO22 | ❌ |
+
+Interesting side note: the pins this board currently spends on `UNUSED_GPIO_3/46`, `LED_MONIT`,
+`TP_INT`, `TP_RST` and `SPI_MOSI` (15–20) are exactly the S31's **dedicated SDIO block**
+(`SDIO_DATA0-3`, `SDIO_CLK`, `SDIO_CMD`). A board intended for both parts would want the SD bus
+moved there.
+
+**3. 🟡 Four strapping pins are touched.** `IO36` (pin 21, `SPI_SCK`) is the VDD_SPI strap —
+internally pulled up in the module, but SPI must not sit low through the 3 ms hold window.
+`IO37` (pin 22, `EPD_CS`) is the JTAG-source strap, defaults **floating**, and per the SoC
+datasheet must be externally driven — the board has no pull on `EPD_CS`. `IO60` (pin 26) is a
+boot strap and is exposed on `J6` pin 3.
+
+**The boot button survives by luck.** Download boot needs `GPIO61 = 0, GPIO60 = 1`; `SW6` pulls
+pin 27 (`IO61`) low and `IO60` defaults to a weak pull-up, so `SW6` still works. But
+`GPIO61 = 0` *with* `GPIO60 = 0` is documented as invalid, and `IO60` is reachable from the
+header — worth a pull-up if dual support is ever a goal.
+
+**No action required for the current board.** The `TP3`/`TP4`/`TP5` pads remain correct and
+useful for non-octal S3 builds. This is scoped for a future revision, and the datasheet is
+still pre-release/CONFIDENTIAL.
+
+### 6.19 Smaller observations
 
 * **`R14` (3 Ω, 0805) — concern WITHDRAWN.** My 120 mW figure assumed 200 mA *continuously*; `R14` only conducts while `Q4` is on, and the current is a rising triangle. `I_rms = I_pk·√(D/3)` gives 63–97 mA over D = 0.3–0.7, so **P = 12–28 mW**, i.e. 10–22 % of an 0805's 125 mW. Comfortable. No action.
 * **`C7` (0.1 µF, P+ → B−)** is correctly the DW01A's datasheet `C1` (VCC-to-GND, where the IC's GND *is* B−). ✔ This is right and easy to mistake for an error — worth a schematic note so a future reviewer doesn't "fix" it.

@@ -102,22 +102,19 @@ Several blocks are populated only if the chosen panel needs them:
 
 The whole design is a single A2 sheet. It divides into four domains:
 
-```
-   ┌─────────────── POWER ────────────────┐
-   USB-C ─ fuse ─ Schottky ─┬─ TP4056 charger ─ BAT ─┐
-                            │                        │
-                            └──── TPS2116 mux ◄──────┴─ protected cell
-                                      │
-                                   LDO_IN ──┬── AP2112K ── 3V3
-                                            └── TPS923610 (frontlight boost)
+| Stage | Path |
+|---|---|
+| Input | USB-C → PPTC fuse → Schottky → `USB_VBUS` |
+| Charging | `USB_VBUS` → TP4056 → `P+` (protected cell) |
+| Source select | TPS2116 picks `USB_VBUS` or `P+` → `LDO_IN` |
+| Regulation | `LDO_IN` → AP2112K → `3V3` (everything digital) |
+| Frontlight | `LDO_IN` → TPS923610 boost → up to 24.5 V (bypasses the LDO) |
+| Panel HV | `3V3` → charge pump driven by the panel → ±15–22 V |
 
-   ┌────────────── PROCESSOR ──────────────┐
-   ESP32-S3-WROOM-1  ── native USB (no UART bridge)
-                     ── 4-bit SDMMC ── microSD (power-gated)
-                     ── SPI ── 24-pin e-paper ZIF
-                     ── I²C ── RTC + touch panel
-                     ── 3× ADC ── buttons ×2, battery, USB status, frontlight
-```
+The processor sits on `3V3` and reaches the outside world through native USB (no UART bridge),
+4-bit SDMMC to the microSD, SPI to the e-paper ZIF, I²C to the RTC and touch panel, and five
+ADC channels for the buttons, battery, USB status and frontlight monitor.
+
 
 **Three voltage domains:**
 
@@ -326,15 +323,8 @@ drive the ADC pin negative. The cost is a small load-dependent offset — ~7 mV 
 Three open-drain status signals are encoded onto **one ADC pin** (`IO2`) through a resistor
 ladder — a neat piece of pin economy.
 
-```
-3V3 ──R70 100k──┬── USB_STAT (IO2) ──C23 2.2n── GND
-                ├──R17 150k── ST     (TPS2116)
-                ├──R67  56k── CHRG   (TP4056)
-                └──R71  22k── STDBY  (TP4056)
-```
-
-Each asserted signal pulls its resistor to ground, and the resulting divider gives a distinct
-voltage:
+Each asserted signal pulls its resistor to ground against the 100 kΩ pull-up (`R70`), and
+the resulting divider voltage identifies the state:
 
 | State | Asserted | `USB_STAT` |
 |---|---|---:|
@@ -370,12 +360,89 @@ USB OTG peripheral, so there is **no CH340/CP2102 bridge** on this board. That r
 its power draw, and its driver headaches, and it enables USB Mass Storage (exposing the SD
 card to a host) and native DFU.
 
-**S31 future-proofing.** `TP3`/`TP4`/`TP5` land on `IO37`/`IO36`/`IO35`. On an octal-PSRAM S3
-those pins are consumed internally by the PSRAM bus and **must not be used**. On the
-ESP32-S31, whose PSRAM does not occupy them, they become three free GPIOs. They are provided
-as bare test pads — unused today, available later.
+### The `TP3`/`TP4`/`TP5` pads and the ESP32-S31
 
-![ESP32 decoupling](images/18-esp-decoupling.png)
+`TP3`/`TP4`/`TP5` land on `IO37`/`IO36`/`IO35`. On an **octal-PSRAM** ESP32-S3 (the `R8`
+variants) those three pins are consumed internally by the PSRAM bus and must not be used; on
+every other S3 variant they are free GPIO. The pads exist so a build that does not need octal
+PSRAM gets three extra IO for nothing.
+
+The schematic note beside them reads *"ESP32-S31-WROOM-1 does not reserve GPIO for PSRAM.
+Future proofing :)"*. **That is correct.** Per the ESP32-S31-WROOM-1 datasheet (Pre-release
+v0.1) the module's PSRAM is *in-package and not pinned out* — the S31 loses no GPIO to PSRAM
+at all, and all three published variants (`N8R16V`, `N16R16V`, `N32R16V`) carry **16 MB** of
+octal PSRAM alongside 8/16/32 MB of quad SPI flash.
+
+#### Is the S31-WROOM-1 a drop-in?
+
+**Mechanically, yes.** Both modules are **18.0 × 25.5 × 3.1 mm** with **40 castellated
+perimeter pads on a 1.27 mm pitch**. Espressif clearly designed for main-pin compatibility, and
+four things land exactly where this board already expects them:
+
+| Pin | S3-WROOM-1 | S31-WROOM-1 | |
+|---:|---|---|---|
+| 1, 40 | GND | GND | ✅ |
+| 2 | 3V3 | 3V3 | ✅ |
+| 3 | EN | EN | ✅ |
+| 13 / 14 | IO19 / IO20 (USB D−/D+) | IO33 / IO34 (`USB1P1_N0`/`_P0`) | ✅ **USB works** |
+| 36 / 37 | RXD0 / TXD0 | RX0 / TX0 | ✅ **UART0 works** |
+
+So power, reset, USB and the serial console all survive the swap untouched.
+
+**Electrically, it is not a drop-in — but it is closer than you would expect.** Pins 4–35, 38
+and 39 keep their *positions* but change their *GPIO numbers*, which is only a firmware
+concern. Three hardware issues are real:
+
+**1. Three of the five analog signals land on pins with no ADC.** The S31 concentrates its ADC
+channels on pins 28–35, 38 and 39 (as differential `ADC1_CH0_N/P` … pairs):
+
+| Board signal | Pin | S31 GPIO | ADC? |
+|---|---:|---|---|
+| `BUTTON_ADC_1` | 39 | IO57 | ✅ ADC2_CH3_P |
+| `USB_STAT` | 38 | IO56 | ✅ ADC2_CH3_N |
+| `BUTTON_ADC_2` | 4 | IO2 | ❌ **none** |
+| `BAT_MONIT` | 12 | IO35 | ❌ **none** |
+| `LED_MONIT` | 17 | IO22 | ❌ **none** |
+
+The second button ladder, the battery gauge and the frontlight monitor would all need
+rerouting to pins 28–35.
+
+**2. Four strapping pins are hit**, because the S31 moves its straps to `GPIO36`, `GPIO37`,
+`GPIO60` and `GPIO61`:
+
+| Pin | Board net | S31 strap | Consequence |
+|---:|---|---|---|
+| 21 | `SPI_SCK` | `IO36` — VDD_SPI voltage | Module pulls it up internally; SPI must not sit low through the 3 ms strap window |
+| 22 | `EPD_CS` | `IO37` — JTAG source | Defaults *floating* and must be externally driven — the board has no pull here |
+| 26 | `UNUSED_GPIO_45` | `IO60` — boot mode + ROM print | Exposed on `J6` pin 3; a user pulling it low changes boot behaviour |
+| 27 | `ESP32_IO0` | `IO61` — boot mode | **Still works** — see below |
+
+The boot button is a happy accident. The S31 enters download mode with `GPIO61 = 0` and
+`GPIO60 = 1`; `SW6` pulls pin 27 (`IO61`) low and `IO60` defaults to a weak pull-up, so
+**`SW6` still selects download boot**. The caveat is that `GPIO61 = 0` *and* `GPIO60 = 0`
+is documented as invalid, and `IO60` is reachable from the expansion header.
+
+**3. The centre of the footprint differs.** The S3-WROOM-1 has a single large thermal/ground
+pad — on this board, a 3.90 × 3.90 mm GND pad. The S31 instead places **20 signal pads
+(0.4 × 0.8 mm) and 9 ground pads (0.9 × 0.9 mm)** in that same central area, carrying `IO8`–
+`IO19`, `DM`/`DP` (the High-Speed USB OTG pair) and `IO48`–`IO53`.
+
+Those extra IO are optional — nothing forces you to connect them — but the board's solid GND
+pad sits directly beneath them. **Soldering an S31 onto the unmodified footprint risks shorting
+those signal pads to ground.** A future revision should shrink or split that centre pad; a
+one-off experiment should at minimum leave it unpasted.
+
+**Summary:** the S31-WROOM-1 is main-pin compatible and would power up, program and talk over
+USB and UART on this board. Full functionality needs a footprint tweak for the centre pad and
+three analog nets rerouted — a board revision, not a substitution. What it would buy is
+substantial: **Wi-Fi 6** (with TWT for far cheaper connected standby), **Bluetooth 5.4 LE +
+Classic**, **802.15.4** (Thread/Zigbee/Matter), a dual-core **RISC-V at 320 MHz**, a **low-power
+coprocessor** that can run while the main cores sleep, **16 MB of PSRAM that costs no GPIO**,
+**54 GPIOs**, USB **High-Speed** OTG, and a differential ADC. For an e-reader the standouts are
+the PSRAM, the LP core and TWT; the Ethernet MAC, CAN FD and 320 MHz dual-core are dead weight.
+
+*(Datasheet status: Pre-release v0.1, marked CONFIDENTIAL. Treat all of the above as
+provisional until Espressif publishes a public release.)*
 
 Decoupling is deliberately clustered at the module: `C32` 22 µF bulk plus `C33`/`C30`/`C24`
 0.1 µF locals. Several schematic annotations ("2.2n cap placed near ESP32", "1u cap placed at
@@ -480,12 +547,9 @@ self-wake, silently draining the battery.
 
 The e-paper panel needs roughly **±22 V** gate rails and ±15 V source rails, generated on-board:
 
-```
-3V3 ─ L1 (22 µH) ─┬─ EINK_SW ─ Q4 (BSS138) ─ RESE ─ R14 (3 Ω) ─ GND
-                  ├─ D5 ─→ PREVGH  (positive rail, → VGH)
-                  └─ C11 ─ node ─ D6 ─→ GND
-                             node ─ D4 ─→ PREVGL  (negative rail, → VGL)
-```
+`L1` and `Q4` form a boost stage whose switch node (`EINK_SW`) feeds two rectifier legs:
+`D5` produces the positive rail (`PREVGH` → `VGH`), while `C11` with `D6`/`D4` forms an
+inverting charge pump for the negative rail (`PREVGL` → `VGL`).
 
 **The panel drives its own supply.** `GDR` (panel pin 2) switches `Q4`'s gate; `RESE`
 (pin 3) is the panel's current-sense return through `R14` (3 Ω). The panel's internal
@@ -522,10 +586,9 @@ Optional block, for panels with a bonded frontlight (or an external light strip)
 
 **`U10` `TPS923610DRLR`** — a synchronous boost LED driver, up to 24.5 V.
 
-```
-LDO_IN ─ L2 (4.7 µH) ─ SW ─┤U10├─ VOUT ─ LED_SW ─┬─ cool string ─ C− ─ Q6 ─┐
-                                                 └─ warm string ─ W− ─ Q5 ─┴─ FB ─ R37 ─ GND
-```
+`U10` boosts `LDO_IN` up to the string's forward voltage on `LED_SW`, which feeds the anodes
+of both LED strings. Each string's cathode returns through its own N-FET to the shared sense
+resistor `R37`.
 
 **Constant-current, not constant-voltage.** `U10` regulates `FB` to 200 mV across `R37`:
 
@@ -566,6 +629,8 @@ colour, and no firmware fault can double the load.
 `R49`/`R50` (1 M) bleed the two cathode nets to ground so neither floats when its FET is off.
 `R75` (100 k) holds `COLOR_SEL` low at boot, so the inverter never sits at mid-rail (which
 would draw shoot-through current).
+
+![Colour select](images/18-color-select.png)
 
 ### Colour-temperature blending
 
@@ -644,13 +709,15 @@ string's known forward voltage. `D3` (SMAJ26A) clamps transients at the connecto
 
 ## 8. Touch interface
 
-![Touch](images/15-touch.png)
+![Touch connector](images/15-touch.png)
 
 Optional block for `-FT01C`-class panels with bonded capacitive touch.
 
 `J4` is a 6-pin 0.5 mm ZIF carrying **GND, VDD, RST, INT, SDA, SCL** — a standard I²C touch
 controller interface. `TP_RST` (`IO11`) and `TP_INT` (`IO10`) are dedicated pins; SDA/SCL join
 the shared I²C bus. `U7` (TPD4E1U06) provides ESD protection on all four signal lines.
+
+![Touch jumper mux](images/15b-touch-jumpers.png)
 
 **The jumper mux.** Touch panels are frustratingly inconsistent about pin order, so the board
 includes a re-mapping option built from 0 Ω resistors:
@@ -789,10 +856,12 @@ attached.
 **`J6` `PPPC062LJBN-RC`** — a 2×6, 0.1"-pitch female header. This is the "one board as a basis
 for any e-ink development" promise made concrete.
 
-```
-row 1:  1 GND    2 IO46   3 IO45   4 GND     5 LED_SW   6 W−
-row 2:  7 3V3    8 SDA    9 IO3   10 SCL    11 C−      12 P+
-```
+| | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| **row 1** | GND | IO46 | IO45 | GND | LED_SW | W− |
+| | **7** | **8** | **9** | **10** | **11** | **12** |
+| **row 2** | 3V3 | SDA | IO3 | SCL | C− | P+ |
+
 
 What it exposes:
 
@@ -826,8 +895,6 @@ implement its own regulation, rather than being limited by the LDO's remaining h
 ---
 
 ## 12. Test points & mounting
-
-![Test points](images/20-testpoints.png)
 
 `TP1` (`RX`) and `TP2` (`TX`) expose UART0 for serial debugging — useful even though
 programming happens over native USB, since the ROM bootloader and early boot messages come
