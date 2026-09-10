@@ -539,7 +539,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 14 | `J6`: swap `SDA` (pin 4) ↔ `GND` (pin 12) | Only real HV adjacency; `W−`/`C−` turned out to be low-voltage nets |
 | 2 | `J2` symbol: pin 4 `VGL` → **NC**, audit the other 23 names | Circuit is correct; the symbol caused a false finding |
 | 18 | Resolve 6 `lib_symbol_mismatch`; **regenerate BOM / netlist / gerbers** | Artefacts are 3–5 weeks stale and materially wrong |
-| 17 | If an **R8** S3 ships: keep TP3/4/5 stubs <2 mm or DNP-jumper them + silkscreen the restriction | S31 and S3 N/R2 are unaffected |
+| 17 | **`N8R8` is fitted**: keep TP3/4/5 stubs <2 mm or DNP-jumper them, and silkscreen the restriction | IO35–37 are the octal-PSRAM bus on `R8` parts |
 | 20 | **Bench-measure `USB_STAT` unplugged** — expect 1.98 V | ~0.93 V means TP4056 ESD backfeed; its datasheet doesn't rate those pins |
 
 **Optional:**
@@ -570,7 +570,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 26 | `R14` power rating | I used peak instead of RMS — actual is 12–28 mW of 125 mW |
 | 30 | `R14` written as `3R` | Your bare-number-equals-ohms convention is consistent |
 | 2.4 | e-paper `VGL` cap | Pin 4 is NC; the symbol label was wrong |
-| 6.13 | `N16R8` incompatibility | The **S31** exists and frees IO35–37; my model was out of date |
+| 6.13 | `N16R8` incompatibility | Overstated — short stubs or DNP jumpers make the pads safe on `R8` |
 
 ---
 
@@ -748,28 +748,29 @@ Traced completely: `3V3 → L1 22 µH → EINK_SW → Q4(BSS138) → RESE → R1
 At 24.5 V out, 15 mA, D = 0.865: `V_ripple = I×D/(C×f)`.
 Nominal 1 µF → 11.8 mV. **Derated to ~0.35 µF (1 µF 50 V 0805 at 20 V bias) → 34 mV.** With 2.2 µF (≈0.8 µF derated) → 15 mV. Confirms item 11 — not dangerous, but the derated part gives ~3× the intended ripple, which modulates LED current and shows up on `LED_MONIT`.
 
-### 6.13 ESP32-S3 variant vs `TP3`/`TP4`/`TP5` — conditional, not absolute
+### 6.13 🟢 `TP3`/`TP4`/`TP5` are octal-PSRAM pins on the fitted `N8R8`
 
-*(Corrected: the **ESP32-S31-WROOM-1** is a real part, pin-compatible with the S3, whose PSRAM does **not** occupy IO35–IO37. My model predates it. The test points are valid future-proofing for that module.)*
-
-The constraint applies only to what is **actually fitted**. For ESP32-S3 modules, datasheet v1.8 Table 3-1 footnote b is explicit:
+ESP32-S3-WROOM-1 datasheet v1.8, Table 3-1, footnote b:
 
 > *"For modules with Octal SPI PSRAM … pins **IO35, IO36, and IO37 are connected to the Octal SPI PSRAM and are not available for other uses**."*
 
-| Fitted module | IO35/36/37 | TP3/4/5 status |
+| Fitted module | IO35/36/37 | TP3/4/5 |
 |---|---|---|
-| S3 **N4/N8/N16** (no PSRAM) | free | OK — fully usable |
-| S3 **N8R2/N16R2** (2 MB *quad*) | free | OK — fully usable |
-| S3 **N8R8/N16R8** (8 MB *octal*) | PSRAM DQ6/DQ7/DQS | **do not connect or probe** |
-| **S31** | free | OK — usable |
+| **N4 / N8 / N16** (no PSRAM) | free | usable |
+| **N8R2 / N16R2** (quad PSRAM, shares flash bus) | free | usable |
+| **N8R8 / N16R8** (octal PSRAM) ← *fitted* | PSRAM DQ6/DQ7/DQS | **do not connect** |
 
-So the pads are sound future-proofing. The only live risk is an **R8** build, where they become unterminated stubs on a DDR bus at 80–120 MHz. Manageable rather than fatal, provided you:
+The board ships with an `R8` part, so on the current build these pads sit on a DDR bus running
+at 80–120 MHz. That is manageable but not free:
 
-1. **Keep the stub microscopic** — TP pad immediately against the module pad, no routed trace. 1–2 mm adds ~1 pF and is harmless; 10 mm across the board is not.
-2. **Better: DNP-jumper them.** A `0 Ω` (DNP) between each module pin and its TP pad means an R8 build has *no* stub at all, and an S31 build just gets three jumpers fitted. This gives you both cleanly.
-3. **Mark them** — silkscreen/schematic note: *"IO35–37: do not connect on octal-PSRAM (R8) modules."* Exactly the kind of constraint that gets lost between revisions.
+1. **Keep the stub microscopic** — TP pad hard against the module pad, no routed trace. 1–2 mm
+   adds ~1 pF and is harmless; 10 mm across the board is not.
+2. **Better: DNP-jumper them.** A `0 Ω` (DNP) between each module pin and its TP pad means an
+   `R8` build has *no* stub at all, and a non-octal build just gets three jumpers fitted.
+3. **Mark the restriction** — silkscreen or schematic note: *"IO35–37: do not connect on
+   octal-PSRAM (R8) modules."* Exactly the kind of constraint that gets lost between revisions.
 
-Pin the default S3 variant in the BOM. If it is `N16R8`, item 1 or 2 is mandatory; if it is `N16R2`, nothing to do.
+Pin the intended variant in the BOM either way.
 
 ### 6.14 ✅ **`Q7` freed and reused — DONE.** LED boost now runs from `LDO_IN`; `Q7` became the SD load switch
 
@@ -922,81 +923,7 @@ should be small.
 
 There is a real trade here and it should be resolved with a measurement rather than a default.
 
-### 6.18 🟡 **NEW** — what an ESP32-S31-WROOM-1 swap would actually require
-
-Verified against the **ESP32-S31-WROOM-1 Datasheet, Pre-release v0.1** (Table 3-1 pin
-definitions, Table 4-3 boot mode, §5.2.2.10 SDHOST, §5.2.3.3 ADC, Figure 9-1 dimensions).
-
-**Correction to an earlier draft of this review:** I previously stated the S31-WROOM-1 was not
-footprint-compatible, based on the published *WROOM-3* datasheet (99 pins) and Espressif's
-product table. **That was wrong.** The S31-WROOM-1 is **18.0 × 25.5 × 3.1 mm with 40
-castellated pads on a 1.27 mm pitch** — the same main-pin layout as the S3-WROOM-1. Power
-(1, 2), `EN` (3), USB (13/14) and UART0 (36/37) all land on identical pins.
-
-#### The blocker: ADC1 pin sets are disjoint
-
-**ADC2 is unusable while Wi-Fi is active on both parts**, so only ADC1 counts. Mapping each
-part's ADC1 GPIOs onto physical module pins:
-
-| Part | ADC1 GPIOs | Physical perimeter pins |
-|---|---|---|
-| ESP32-S3 | GPIO1–GPIO10 | **4, 5, 6, 7, 12, 15, 17, 18, 38, 39** |
-| ESP32-S31 | GPIO42–GPIO49 | **28, 29, 30, 31, 32, 33** (+ inner pads 56, 57) |
-
-**The intersection is empty.** There is not one physical pin that offers ADC1 on both parts, so
-**no single pin assignment can serve both** — this is a hard result, not a tuning problem.
-
-Good news on the S31 side taken alone: §5.2.3.3 says each SAR ADC measures *"analog signals
-from up to eight pins"*, so the `_N`/`_P` suffixes denote optional differential pairing, not a
-requirement. Six single-ended ADC1 inputs on pins 28–33 comfortably covers this board's five
-analog nets. An **S31-only** board is perfectly feasible.
-
-But pins 28–33 currently carry `TP5`/`TP4`/`TP3`, `I2C_SDA`, `I2C_SCL` and `PWM_LED` — and on
-an S3 those pins are `IO35`–`IO40`, none of which are ADC-capable (and `IO35/36/37` are the
-octal-PSRAM pins on `R8` parts). So the analog cannot simply be moved there and left alone.
-
-Supporting both parts would mean bringing all five analog nets to **two** pins each with 0 Ω
-select jumpers — ten resistors, plus dual routing for the five signals displaced from pins
-28–33 — on a board whose stated goal is to be cheap and easy to understand. **Not worth it.**
-
-#### The SD bus would also need moving
-
-§5.2.2.10: *"For the SD/SDIO/MMC host controller, card one can use GPIO20–GPIO25 via IO MUX,
-and card two can use GPIO35–GPIO40 via IO MUX."* Note the datasheet mentions **only IO MUX**
-here, in contrast to UART (§5.2.2.1: *"They also support mapping to other pins through the GPIO
-Matrix"*) and UART1-3 (*"routed to any HP GPIO pins via the GPIO Matrix"*). SDHOST should
-therefore be treated as **fixed to those two pin groups**, not freely mux-able.
-
-On the module that means card 1 = pins 15–20 and card 2 = pins 12, 21–25. This board's SD bus
-is on pins 5–10, which is neither group. (Ironically, pins 15–20 currently carry
-`UNUSED_GPIO_3/46`, `LED_MONIT`, `TP_INT`, `TP_RST` and `SPI_MOSI` — an S31-targeted layout
-would put the SD bus exactly there.)
-
-#### Other differences, for completeness
-
-* **Centre pad.** `U4`'s footprint has pad 41 as a single **3.90 × 3.90 mm GND** pad. The S31
-  puts **20 signal pads (0.4 × 0.8 mm) + 9 GND pads (0.9 × 0.9 mm)** there, carrying `IO8`–
-  `IO19`, `DM`/`DP` and `IO48`–`IO53`. Soldering an S31 to the unmodified footprint risks
-  shorting those to ground.
-* **Four strapping pins move**: `IO36` (pin 21, `SPI_SCK`, VDD_SPI strap, internally pulled up),
-  `IO37` (pin 22, `EPD_CS`, JTAG strap, defaults floating and must be driven), `IO60` (pin 26,
-  boot strap, exposed on `J6`), `IO61` (pin 27). The boot button survives by luck — download
-  boot needs `GPIO61 = 0, GPIO60 = 1`, and `SW6` plus `IO60`'s internal pull-up gives exactly
-  that.
-
-#### Recommendation: drop S31 compatibility as a goal
-
-The pin maps diverge too far. **Keep `TP3`/`TP4`/`TP5`** — they remain genuinely useful on
-non-octal S3 variants (`N4`/`N8`/`N16`/`R2`), which is a real and immediate benefit.
-
-**Reword the schematic note**, though. It currently reads *"ESP32-S31-WROOM-1 does not reserve
-GPIO for PSRAM. Future proofing :)"*, which implies a drop-in path that does not exist. Better:
-*"IO35–37: free GPIO on non-octal-PSRAM S3 variants (N4/N8/N16/R2); do not connect on R8."*
-
-If the S31 ever becomes compelling, it is a **new board revision** — and a clean one, since the
-S31's own pin grouping is quite favourable (SD on pins 15–20, analog on 28–33).
-
-### 6.19 Smaller observations
+### 6.18 Smaller observations
 
 * **`R14` (3 Ω, 0805) — concern WITHDRAWN.** My 120 mW figure assumed 200 mA *continuously*; `R14` only conducts while `Q4` is on, and the current is a rising triangle. `I_rms = I_pk·√(D/3)` gives 63–97 mA over D = 0.3–0.7, so **P = 12–28 mW**, i.e. 10–22 % of an 0805's 125 mW. Comfortable. No action.
 * **`C7` (0.1 µF, P+ → B−)** is correctly the DW01A's datasheet `C1` (VCC-to-GND, where the IC's GND *is* B−). ✔ This is right and easy to mistake for an error — worth a schematic note so a future reviewer doesn't "fix" it.

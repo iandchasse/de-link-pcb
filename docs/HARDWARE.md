@@ -360,92 +360,17 @@ USB OTG peripheral, so there is **no CH340/CP2102 bridge** on this board. That r
 its power draw, and its driver headaches, and it enables USB Mass Storage (exposing the SD
 card to a host) and native DFU.
 
-### The `TP3`/`TP4`/`TP5` pads and the ESP32-S31
+### The `TP3`/`TP4`/`TP5` pads
 
 `TP3`/`TP4`/`TP5` land on `IO37`/`IO36`/`IO35`. On an **octal-PSRAM** ESP32-S3 (the `R8`
-variants) those three pins are consumed internally by the PSRAM bus and must not be used; on
-every other S3 variant they are free GPIO. The pads exist so a build that does not need octal
-PSRAM gets three extra IO for nothing.
+variants, including the `N8R8` fitted here) those three pins are consumed internally by the
+PSRAM bus and **must not be connected or probed**. On every other S3 variant — `N4`, `N8`,
+`N16`, and the quad-PSRAM `R2` parts — they are ordinary free GPIO.
 
-The schematic note beside them reads *"ESP32-S31-WROOM-1 does not reserve GPIO for PSRAM.
-Future proofing :)"*. **That is correct.** Per the ESP32-S31-WROOM-1 datasheet (Pre-release
-v0.1) the module's PSRAM is *in-package and not pinned out* — the S31 loses no GPIO to PSRAM
-at all, and all three published variants (`N8R16V`, `N16R16V`, `N32R16V`) carry **16 MB** of
-octal PSRAM alongside 8/16/32 MB of quad SPI flash.
+The pads therefore cost nothing on the current build and hand three extra IO to anyone who
+fits a non-octal module. Keep the stubs short and mark the restriction, so an `R8` build
+cannot accidentally load a DDR PSRAM line.
 
-#### Is the S31-WROOM-1 a drop-in?
-
-**Mechanically, yes.** Both modules are **18.0 × 25.5 × 3.1 mm** with **40 castellated
-perimeter pads on a 1.27 mm pitch**. Espressif clearly designed for main-pin compatibility, and
-four things land exactly where this board already expects them:
-
-| Pin | S3-WROOM-1 | S31-WROOM-1 | |
-|---:|---|---|---|
-| 1, 40 | GND | GND | ✅ |
-| 2 | 3V3 | 3V3 | ✅ |
-| 3 | EN | EN | ✅ |
-| 13 / 14 | IO19 / IO20 (USB D−/D+) | IO33 / IO34 (`USB1P1_N0`/`_P0`) | ✅ **USB works** |
-| 36 / 37 | RXD0 / TXD0 | RX0 / TX0 | ✅ **UART0 works** |
-
-So power, reset, USB and the serial console all survive the swap untouched.
-
-**Electrically, it is not a drop-in — and the gap is structural.** Pins 4–35, 38 and 39 keep
-their *positions* but change their *GPIO numbers*, which is only a firmware concern. Two
-hardware issues are not:
-
-**1. The ADC1 pin sets are disjoint.** ADC2 is unusable while Wi-Fi is active on both parts, so
-only ADC1 counts:
-
-| Part | ADC1 GPIOs | Physical perimeter pins |
-|---|---|---|
-| ESP32-S3 | GPIO1–GPIO10 | 4, 5, 6, 7, 12, 15, 17, 18, 38, 39 |
-| ESP32-S31 | GPIO42–GPIO49 | 28, 29, 30, 31, 32, 33 (+ inner pads 56, 57) |
-
-**No physical pin offers ADC1 on both parts.** Taken alone the S31 is fine — its six perimeter
-ADC1 pins comfortably cover this board's five analog nets, and the `_N`/`_P` suffixes denote
-optional differential pairing rather than a requirement. But pins 28–33 currently carry the
-three test points, `I2C_SDA`, `I2C_SCL` and `PWM_LED`, and on an S3 those same pins are
-`IO35`–`IO40` — none ADC-capable. Serving both would take ten 0 Ω select jumpers plus dual
-routing for the displaced signals.
-
-**2. The SD bus is on the wrong pins.** The S31's SD/MMC host is documented for **IO MUX only** —
-*"card one can use GPIO20–GPIO25 via IO MUX, and card two can use GPIO35–GPIO40 via IO MUX"* —
-with no GPIO Matrix escape hatch (unlike UART and SPI, where the datasheet says so explicitly).
-That means module pins 15–20 or 12/21–25. This board's SD bus sits on pins 5–10.
-
-**3. The centre of the footprint differs.** The S3-WROOM-1 has a single large thermal/ground
-pad — on this board, a 3.90 × 3.90 mm GND pad. The S31 instead places **20 signal pads
-(0.4 × 0.8 mm) and 9 ground pads (0.9 × 0.9 mm)** in that area, carrying `IO8`–`IO19`,
-`DM`/`DP` (the High-Speed USB OTG pair) and `IO48`–`IO53`. Those extra IO are optional, but the
-board's solid GND pad sits directly beneath them, so soldering an S31 to the unmodified
-footprint risks shorting them to ground.
-
-Four strapping pins also move (`IO36`, `IO37`, `IO60`, `IO61` at pins 21, 22, 26, 27). The boot
-button happens to survive: download boot needs `GPIO61 = 0` with `GPIO60 = 1`, and `SW6` pulling
-pin 27 low against `IO60`'s internal pull-up gives exactly that.
-
-**Conclusion: S31 compatibility is not a design goal for this board.** The pin maps diverge too
-far to bridge economically. `TP3`/`TP4`/`TP5` remain worth having for the immediate benefit they
-already provide on non-octal S3 variants (`N4`/`N8`/`N16`/`R2`). If the S31 ever becomes
-compelling it is a fresh board revision — and a tidy one, since the S31's own grouping is
-favourable: SD on pins 15–20, analog on 28–33.
-
-What such a board would gain: **Wi-Fi 6** (with TWT for far cheaper connected standby),
-**Bluetooth 5.4 LE + Classic**, **802.15.4** (Thread/Zigbee/Matter), a dual-core **RISC-V at
-320 MHz**, a **low-power coprocessor** that runs while the main cores sleep, **16 MB of PSRAM
-that costs no GPIO**, **54 GPIOs**, USB **High-Speed** OTG, and a differential ADC. For an
-e-reader the standouts are the PSRAM, the LP core and TWT; the Ethernet MAC, CAN FD and
-320 MHz dual-core are dead weight.
-
-*(Datasheet status: Pre-release v0.1, marked CONFIDENTIAL. Treat all of the above as
-provisional until Espressif publishes a public release.)*
-
-Decoupling is deliberately clustered at the module: `C32` 22 µF bulk plus `C33`/`C30`/`C24`
-0.1 µF locals. Several schematic annotations ("2.2n cap placed near ESP32", "1u cap placed at
-ESP32") show that the *physical* placement of the analog filter caps was treated as part of
-the design, not left to layout.
-
----
 
 ## 5. Storage — 4-bit SDMMC
 
@@ -937,7 +862,7 @@ Every ESP32-S3 pin, as used:
 | 25 | IO48 | — | EPD BUSY (via `R34`) |
 | 26 | IO45 | — | Spare → `J6` pin 3 |
 | 27 | IO0 | `ESP32_IO0` | Boot mode (SW6) |
-| 28–30 | IO35–37 | `IO3x_PSRAM` | PSRAM (S3) / spare (S31) — `TP5`/`TP4`/`TP3` |
+| 28–30 | IO35–37 | `IO3x_PSRAM` | Octal PSRAM on `R8` — free GPIO on other variants; `TP5`/`TP4`/`TP3` |
 | 31 | IO38 | `I2C_SDA` | I²C data |
 | 32 | IO39 | `I2C_SCL` | I²C clock |
 | 33 | IO40 | `PWM_LED` | Frontlight brightness |
