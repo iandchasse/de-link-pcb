@@ -58,7 +58,8 @@ Successor to [de-link](https://de-link.me).
 12. [Test points & mounting](#12-test-points--mounting)
 13. [Complete GPIO map](#13-complete-gpio-map)
 14. [Design themes](#14-design-themes)
-15. [Open questions](#15-open-questions)
+15. [What changed from de-link](#15-what-changed-from-de-link)
+16. [Design notes & conventions](#16-design-notes--conventions)
 
 ---
 
@@ -498,9 +499,18 @@ is fitted, which is a large part of how one board supports many displays.
 producing the negative rail. `R15` (10 k) pulls `Q4`'s gate down so the pump stays off when
 the panel is unpowered or high-Z.
 
+**`R14` = 3 Ω** sets the panel's peak switching current. The value comes from a Waveshare
+e-paper development board, which offered a switch-selectable 3 Ω / 0.47 Ω and has proven
+reliable at 3 Ω in practice. The two values trade differently: a **larger** sense resistor
+terminates each pulse at a **lower** peak current, giving less ripple, lower EMI and a gentler
+duty on `Q4` and `L1` — at the cost of less energy per cycle, so the pump takes longer to bring
+the HV rails up and can supply less current. 0.47 Ω would suit a larger panel that needs more
+gate-drive current; 3 Ω suits a 4.26" panel and is the quieter choice on a 2-layer board. If a
+future display shows slow refreshes or sagging gate rails, this is the resistor to lower.
+
 **`L1` = `VLS3012HBX-220M`** (22 µH, metal-composite shielded, 3.0 × 3.0 mm). The metal
 composite core has markedly lower fringing flux than a ferrite drum — worthwhile on a
-2-layer board.
+2-layer board. *(This replaces the original `NR3015T220MNGH`, which is now obsolete.)*
 
 ---
 
@@ -527,6 +537,17 @@ LED brightness depends on *current*, not voltage, and forward voltage varies wit
 and part-to-part — so a current-mode driver is the correct topology. The boost simply raises
 its output until 15 mA flows.
 
+**Target load:** the GDEQ bonded frontlights are **V_f ≈ 15 V, I_f ≤ 15 mA** per channel, so
+`R37` = 13.3 Ω lands exactly on the panel's maximum rating at 100 % `ADIM` duty. The boost
+therefore runs at ~15 V out from a 3–5 V input — comfortably inside the TPS923610's 24.5 V
+ceiling, with the remaining headroom absorbing the higher-V_f strings on other panels.
+
+> **Idle-state check.** With `U10` disabled, `LED_SW` sits at ~`LDO_IN − 0.7 V` (see the
+> firmware note below) — at most 4.3 V. Spread across a ~5-LED, 15 V string that is
+> ~0.86 V per junction, far below the ~2.5 V a white LED needs to conduct. Sub-threshold
+> current is in the picoamp range, so **an idle strip neither glows nor wastes energy**, on
+> either the active (13.3 Ω) or inactive (1 MΩ) return path.
+
 ### Warm / cool selection
 
 This is the most distinctive circuit on the board. Both LED strings share **one boost and one
@@ -535,14 +556,65 @@ sense resistor**; colour is selected by choosing which string's return path is c
 - `COLOR_SEL` (`IO42`) → `Q5` gate (warm)
 - `COLOR_SEL` → `U12` (74LVC1G04 inverter) → `COLOR_SEL_INV` → `Q6` gate (cool)
 
-Because `U12` inverts, **exactly one string ever conducts.** The consequence is a genuine
-safety property: LED current is *always* 15 mA regardless of colour, and no firmware fault
-can double the load. Intermediate colour temperatures are achieved by time-multiplexing
-`COLOR_SEL` — the mix ratio becomes the duty cycle.
+Because `U12` inverts, **exactly one string ever conducts.** Using an inverter rather than two
+GPIOs is deliberate: it makes "both strings on" *electrically impossible* rather than merely
+forbidden by firmware, and it frees a pin.
+
+The consequence is a genuine safety property — LED current is *always* 15 mA regardless of
+colour, and no firmware fault can double the load.
 
 `R49`/`R50` (1 M) bleed the two cathode nets to ground so neither floats when its FET is off.
 `R75` (100 k) holds `COLOR_SEL` low at boot, so the inverter never sits at mid-rail (which
 would draw shoot-through current).
+
+### Colour-temperature blending
+
+Intermediate CCT is produced by **time-multiplexing `COLOR_SEL`**: the duty cycle becomes the
+warm/cool mix ratio.
+
+A property that falls out of the shared sense resistor: because exactly one string carries
+15 mA at any instant, **total current is constant regardless of blend ratio**. CCT and
+brightness are therefore close to orthogonal — `COLOR_SEL` duty sets colour, `ADIM` duty sets
+brightness. The only coupling is that warm and cool LEDs usually differ in luminous efficacy
+by 10–20 %, so firmware may want a small brightness correction as a function of blend.
+
+**Choosing the blend frequency.** Four constraints apply:
+
+| Constraint | Requirement |
+|---|---|
+| Flicker (IEEE 1789-2015) | > 1.25 kHz for "low risk" at high modulation depth |
+| Boost loop settling | ~7–15 µs — not binding |
+| `C9` re-slew if the two strings' V_f differ | **usually the binding constraint** |
+| Beat with the `ADIM` brightness PWM | use an integer frequency ratio |
+
+The third deserves explanation. When `COLOR_SEL` switches, the boost must move `LED_SW` to the
+new string's forward voltage. It can *charge* `C9` quickly, but it can only *discharge* it
+through the LED current, so the falling edge is the slow one:
+
+```
+t = C9 × ΔVf / I_LED
+```
+
+| ΔV_f between strings | discharge time | practical `COLOR_SEL` ceiling |
+|---:|---:|---:|
+| 0.1 V | 31 µs | ~1.6 kHz |
+| 0.2 V | 63 µs | ~800 Hz |
+| 0.5 V | 157 µs | ~320 Hz |
+| 1.0 V | 313 µs | ~160 Hz |
+
+**Recommended starting point:**
+
+- **`ADIM` at 20 kHz** rather than 10 kHz. 10 kHz is the datasheet's lower edge, where the
+  internal filter leaves the most FB ripple; 20 kHz costs nothing and gives margin.
+- **`COLOR_SEL` at 1.25 kHz**, phase-locked to `ADIM` (exactly `ADIM ÷ 16`, so each
+  half-period contains 8 whole `ADIM` cycles and no beat frequency appears).
+- If `ADIM` must stay at 10 kHz, use **1 kHz** (`ADIM ÷ 10`, 5 whole cycles per half-period).
+
+**Measure ΔV_f between the warm and cool strings before committing.** For a bonded frontlight
+they are usually the same die with different phosphor, so ΔV_f should be small (< 0.2 V) and
+1.25 kHz is comfortable. If it turns out large, reduce `C9` rather than slowing `COLOR_SEL`
+into the flicker-visible region — the ripple penalty is far preferable to visible flicker on
+a reading light.
 
 ### Brightness
 
@@ -604,7 +676,7 @@ Eight buttons are read on **two ADC pins** using resistor ladders. Each button c
 own resistor from the ADC node to ground; a 10 kΩ pull-up holds the node at 3.3 V when nothing
 is pressed.
 
-**Ladder 1 — `BUTTON_ADC_1` (`IO1`), pull-up `R4` 10 kΩ:**
+**Ladder 1 — `BUTTON_ADC_1` (`IO1`), pull-up `R4` 10 kΩ — the four bottom-edge buttons:**
 
 | Button | Function | Resistor | Voltage |
 |---|---|---|---:|
@@ -614,15 +686,22 @@ is pressed.
 | `SW9` | BACK | `R20` 56 kΩ | 2.80 V |
 | — | idle | — | 3.30 V |
 
-**Ladder 2 — `BUTTON_ADC_2` (`IO4`), pull-up `R28` 10 kΩ:**
+Bottom row, as seen by the user facing the screen: **BACK · CONFIRM · LEFT · RIGHT**.
 
-| Button | Function | Resistor | Voltage |
-|---|---|---|---:|
-| `SW1` | DOWN(1) | `R61` 100 Ω | 0.03 V |
-| `SW4` | UP(1) | `R11` 12 kΩ | 1.80 V |
-| `SW5` | DOWN(2) | `R35` 33 kΩ | 2.53 V |
-| `SW7` | UP(2) | `R36` 68 kΩ | 2.88 V |
-| — | idle | — | 3.30 V |
+**Ladder 2 — `BUTTON_ADC_2` (`IO4`), pull-up `R28` 10 kΩ — the four side buttons:**
+
+| Button | Function | Side | Resistor | Voltage |
+|---|---|---|---|---:|
+| `SW1` | DOWN(1) | right | `R61` 100 Ω | 0.03 V |
+| `SW4` | UP(1) | right | `R11` 12 kΩ | 1.80 V |
+| `SW5` | DOWN(2) | left | `R35` 33 kΩ | 2.53 V |
+| `SW7` | UP(2) | left | `R36` 68 kΩ | 2.88 V |
+| — | idle | — | — | 3.30 V |
+
+The `(1)` pair is the **right** edge and the `(2)` pair is the **left** edge — so the device is
+usable one-handed from either side, which is the natural page-turn gesture for an e-reader.
+Grouping both sides onto a single ADC pin means a build can populate one side, the other, or
+both without changing anything electrically.
 
 **Why ladders?** Pin economy — 8 buttons on 2 pins instead of 8. On a board that already
 commits pins to SDMMC (6), SPI (6), I²C (2) and USB (2), that is the difference between
@@ -846,36 +925,55 @@ is fitted. This is the single biggest contributor to display agnosticism.
 
 ---
 
-## 15. Open questions
+## 15. What changed from de-link
 
-Points where the intent could not be determined from the schematic alone. These are questions
-*about this documentation*, not defects — anything I believe is a genuine issue is in
-[`DESIGN_REVIEW.md`](../DESIGN_REVIEW.md).
+Silkscreen is a substantial revision of [de-link](https://de-link.me) rather than a new board.
+The predecessor's history lives largely in backups and was not closely documented, so this is a
+summary of the material changes rather than a commit-level changelog:
 
-1. **Button labels vs. physical placement.** The silkscreen text reads
-   `RIGHT / LEFT / CONFIRM / BACK` for ladder 1 and `DOWN(1) / UP(1) / DOWN(2) / UP(2)` for
-   ladder 2. The brief describes "4 buttons on the bottom (ADC_BUTTON_1)" and "4 buttons on
-   the sides (ADC_BUTTON_2)". Is ladder 1 the bottom row, and are the `(1)`/`(2)` suffixes
-   left/right side pairs? I documented the silkscreen names.
+| Area | Change |
+|---|---|
+| **Accessory header** | Refined into the current 12-pin `J6`, grouped by voltage domain and fully ESD-protected |
+| **Power path** | Reworked around the TPS2116 priority mux; idle-current behaviour tightened throughout (high-value dividers, power-gated SD, 130 nA-shutdown LED driver) |
+| **Touch** | Added ? `J4` plus the `U7` ESD array and the 0 ? pin-swap jumpers |
+| **RTC** | Added ? `U13` DS3231MZ on the shared I?C bus |
+| **Frontlight** | Moved from the AP3012 to the TPS923610, gaining proper dimming control; the two colour-select GPIOs were replaced by one GPIO plus the `U12` inverter |
+| **ESD** | Expanded and refined ? now six arrays plus three rail clamps |
+| **Charge reporting** | Added the `USB_STAT` resistor ladder for accurate charge-state detection |
+| **Mechanical** | The battery now sits in a cut-out *in* the PCB rather than stacked on top of it |
 
-2. **Intermediate colour temperature.** Is time-multiplexing `COLOR_SEL` an intended feature,
-   or is warm/cool meant as a binary choice? This changes how §7 should describe the block.
+The through-line is that de-link proved the concept and Silkscreen makes it a **base board**:
+more of the board is optional, more of it is protected, and much more of it is configurable
+without a respin.
 
-3. **Frontlight LED string.** How many LEDs in series, and what forward voltage? I used a
-   6 × 3.0 V ≈ 18 V example. The real string determines the actual boost output.
+---
 
-4. **`R14` = 3 Ω sense value.** Was this taken from the GDEQ426T82 reference design, or
-   derived? It sets the panel's charge-pump peak current, so it matters for other displays.
+## 16. Design notes & conventions
 
-5. **Target sleep current.** Is there a design goal (e.g. "< 100 µA") the board is measured
-   against? That would let §14 state the standby budget as an intent rather than an
-   observation.
+Answers to questions that came up while documenting the board, recorded so they do not have to
+be rediscovered.
 
-6. **Enclosure grounding.** All four mounting holes are GND-connected. Is a metal enclosure
-   or metal standoffs anticipated?
+**Sleep current target.** There is no numeric specification ? the goal is simply "as low as
+practical." Measured contributors total roughly 95 ?A, dominated by the LDO's own quiescent
+current (55 ?A). The board is designed so no *avoidable* load remains: the SD card is power
+gated, the LED driver drops to 130 nA, and every monitoring divider is 1 M?-class.
 
-7. **The `de-link` relationship.** Should this document describe what changed from de-link to
-   Silkscreen? That would help readers arriving from the existing project.
+**Enclosure.** The reference enclosure is 3D-printed, but the board is intended to be housed
+in anything. Two implications for a custom case:
+
+- The four `MountingHole_Pad`s are **plated and GND-connected**, so a conductive enclosure
+  (CNC aluminium, for example) will be bonded to signal ground through the standoffs. That is
+  usually desirable for EMC, but it should be a deliberate choice ? use one bonded standoff and
+  three isolated ones if a ground loop through the chassis is a concern.
+- A conductive case must not bridge the exposed high-voltage nets. `LED_SW` (up to 24.5 V) and
+  the panel's ?22 V rails are the ones to keep clear of any metalwork.
+
+**Frontlight load.** The GDEQ bonded frontlights are V_f ? 15 V at I_f ? 15 mA per channel;
+`R37` = 13.3 ? sets exactly 15.0 mA at full `ADIM` duty.
+
+**Button geometry.** Bottom edge, left-to-right facing the screen:
+BACK ? CONFIRM ? LEFT ? RIGHT. Sides: UP(1)/DOWN(1) on the right edge, UP(2)/DOWN(2) on the
+left edge.
 
 ---
 

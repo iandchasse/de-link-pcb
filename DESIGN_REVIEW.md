@@ -534,6 +534,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 
 | # | Change | Note |
 |---|---|---|
+| **35** | **Measure ΔV_f between the warm and cool frontlight strings** — then keep `C9` at 4.7 µF (if <0.2 V) or drop it to 1–2.2 µF (if >0.5 V) | §6.17: `C9` re-slew is the binding limit on CCT blend rate, not the boost loop | 🟡 |
 | 4 | Finish the LED note: still says **"5kHz-25kHz"** (datasheet min is 10 kHz — use 20–100 kHz) and **"0-30V"** (part is 24.5 V max). The `~24V` OVP edit is done | 2 of 3 sub-items outstanding |
 | 14 | `J6`: swap `SDA` (pin 4) ↔ `GND` (pin 12) | Only real HV adjacency; `W−`/`C−` turned out to be low-voltage nets |
 | 2 | `J2` symbol: pin 4 `VGL` → **NC**, audit the other 23 names | Circuit is correct; the symbol caused a false finding |
@@ -858,6 +859,13 @@ The `TPD4E1U06` arrays (`U1`, `U9`) are *not* a problem — they are supply-less
 
 Not a defect — a firmware-facing behaviour worth writing down, found while documenting §7 of [`docs/HARDWARE.md`](docs/HARDWARE.md).
 
+**Confirmed safe for the LED strip.** With the panel frontlight at V_f ≈ 15 V (~5 white LEDs
+in series), an idle `LED_SW` of at most 4.3 V puts **~0.86 V across each junction** — roughly a
+third of the ~2.5 V needed to begin conducting. Sub-threshold current is in the **picoamp**
+range. This holds on both return paths: the *active* string (13.3 Ω via its FET) and the
+*inactive* one (1 MΩ bleed). **No glow, no leakage, no wasted energy.** `C9` simply pre-charges
+to that level, which slightly *reduces* boost start-up work.
+
 A boost converter always has a DC path from input to output: `LDO_IN → L2 → SW → HS-FET body diode → VOUT`. With `U10` disabled (`ADIM` low), `LED_SW` therefore settles at roughly `LDO_IN − 0.7 V`, **not** 0 V, and the `R39`/`R41` divider reports it:
 
 | `LDO_IN` | `LED_SW` (off) | `LED_MONIT` reads | divider draw |
@@ -875,7 +883,46 @@ Three consequences:
 
 If the standby 2–4 µA ever matters, the fix is the same load switch discussed in §6.14 — but at 2–4 µA against a ~95 µA budget it is not currently worth a part.
 
-### 6.17 Smaller observations
+### 6.17 🟡 **NEW** — `C9` = 4.7 µF may limit the CCT blend rate
+
+Now that CCT blending is confirmed as an intended feature, `C9` needs a second look — and this
+partly **undoes my own earlier advice**.
+
+I recommended raising `C9` (1 µF → 4.7 µF) in §3.3 to counter DC-bias derating and reduce
+output ripple. That reasoning assumed a static output. With `COLOR_SEL` time-multiplexing, `C9`
+also has to **re-slew between the two strings' forward voltages on every colour transition** —
+and the boost can only *discharge* it through the LED current:
+
+```
+t_fall = C9 × ΔV_f / I_LED = 4.7 µF × ΔV_f / 15 mA
+```
+
+| ΔV_f (warm vs cool) | discharge time | `COLOR_SEL` ceiling (transient < 10 % of half-period) |
+|---:|---:|---:|
+| 0.1 V | 31 µs | ~1.6 kHz ✔ |
+| 0.2 V | 63 µs | ~800 Hz ⚠ |
+| 0.5 V | 157 µs | ~320 Hz ❌ flicker range |
+| 1.0 V | 313 µs | ~160 Hz ❌ flicker range |
+
+**This is the binding constraint on blend rate** — far more restrictive than the boost's own
+7–15 µs loop settling. IEEE 1789-2015 wants > 1.25 kHz for "low risk" flicker at high
+modulation depth, which is exactly the regime here (each string goes fully off).
+
+**Mitigating factors:** DC-bias derating works *for* you — a 4.7 µF/50 V 0805 at 15 V bias
+delivers perhaps 2–3 µF effective, so real slew times are roughly half the table above. And for
+a bonded frontlight, warm and cool are usually the same die with different phosphor, so ΔV_f
+should be small.
+
+**Action: measure ΔV_f between the two strings before finalising.**
+
+* **ΔV_f < 0.2 V** → keep `C9` = 4.7 µF, run `COLOR_SEL` at 1.25 kHz. Nothing to do.
+* **ΔV_f > 0.5 V** → **reduce `C9` back toward 1–2.2 µF.** Ripple rises to ~30 mV, which is
+  invisible on a frontlight; visible flicker is not. Do *not* solve this by slowing
+  `COLOR_SEL` below ~1 kHz.
+
+There is a real trade here and it should be resolved with a measurement rather than a default.
+
+### 6.18 Smaller observations
 
 * **`R14` (3 Ω, 0805) — concern WITHDRAWN.** My 120 mW figure assumed 200 mA *continuously*; `R14` only conducts while `Q4` is on, and the current is a rising triangle. `I_rms = I_pk·√(D/3)` gives 63–97 mA over D = 0.3–0.7, so **P = 12–28 mW**, i.e. 10–22 % of an 0805's 125 mW. Comfortable. No action.
 * **`C7` (0.1 µF, P+ → B−)** is correctly the DW01A's datasheet `C1` (VCC-to-GND, where the IC's GND *is* B−). ✔ This is right and easy to mistake for an error — worth a schematic note so a future reviewer doesn't "fix" it.
