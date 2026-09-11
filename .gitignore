@@ -8,3 +8,9 @@ minRead_pcb-backups
 # Per-user project state and regenerated caches (KiCad recommends not committing these)
 *.kicad_prl
 fp-info-cache
+
+# KiCad autosave, lock and backup files
+_autosave-*
+~*.lck
+\#auto_saved_files\#
+*.bak

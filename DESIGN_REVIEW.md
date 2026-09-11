@@ -20,8 +20,11 @@ What's left is a set of **value / margin / documentation defects**, several of w
 * ~~a CMOS inverter input floats at boot~~ ✅ **fixed** (`R75` 100 k)
 * ~~the USB-priority threshold is set above the voltage USB_VBUS reaches under load~~ ✅ **fixed** (`R38`=240 k)
 * ⬜ **the 3.3 V LDO reaches thermal shutdown around 300–400 mA, and the LED boost still runs through it** — the `Q7` deletion (§6.14) fixes this
-* ⬜ **the ±15–22 V e-paper capacitors still have no specified voltage rating** — the `50V` annotation in the file is on `C9`, not on `C13`–`C17`/`C20`
-* ⬜ **ERC still reports 1 error** — the `TPS923610` symbol's `GND` pin is typed `power_output`
+* ~~**the ±15–22 V e-paper capacitors have no specified voltage rating**~~ ✅ **fixed** — all of `C11`, `C13`–`C17`, `C20` now carry `/50V`
+* ⬜ **`D1` (series Schottky on VBUS) is redundant** — both downstream ICs have datasheet-specified reverse blocking, and the TP4056 datasheet literally says *"No blocking diode is required."* It costs 0.3–0.6 V of rail headroom, exceeds its own SOD-123 power rating at the current `F1` will pass, and blocks the proper fix for §3.1. See §6.20. **This is the last open electrical question on the schematic.**
+* ~~**ERC still reports 1 error**~~ ✅ **fixed** — ERC is now **0 errors, 40 cosmetic warnings**
+
+**Status at the close of this review:** the schematic is otherwise complete. `D1` (§6.20) is the only outstanding electrical decision; §2.2/§2.3 are documentation-comment edits; §3.5.1 (`L1` replacement) was resolved by part-number update. Placement/layout guidance is in **§8**.
 
 Full status table in **section 5**; per-block detail in **section 6**.
 
@@ -226,9 +229,9 @@ V_switchover = 3.40 V typ  (3.13 – 3.67 V)
 
 Margin becomes **+0.27 V even at 1 A from a 4.75 V source**, and +0.74 V at light load. The threshold still sits above the point where the LDO can no longer hold 3V3 (needs ≥3.72 V input at 600 mA worst case), so genuine brown-out handover still works.
 
-**Fix B — better, if you're revising the board: also replace `D1` with a 0 Ω link, and set `R38` = 270 k** (3.70 V typ, 3.40–4.00 V). This restores 0.31–0.60 V of headroom and gives **+0.54 V margin at 1 A**, while keeping the handover threshold high enough to be useful.
+**Fix B — better, if you're revising the board: also replace `D1` with a 0 Ω link, and set `R38` = 300 k.** See **§6.20**, where this is now fully verified against datasheets and worked through numerically.
 
-Is `D1` removable? It is largely redundant: the **TPS2116 already blocks reverse current** (V_RCB 42 mV typ), and the TP4056 does not drain BAT when VCC is absent. `D1` protects only against back-driving the connector's VBUS pin from `C2`/`C25` (11 µF — trivial) and against reverse polarity on VBUS (essentially impossible on USB-C). It does **not** protect against hot-plug overshoot — that's `CR1`'s job, and note that hot-plug ringing can reach ~2× VBUS, i.e. above the TPS2116's **6 V** and the TP4056's **8 V** absolute maximums, so confirm `CR1` actually clamps below 6 V. Keep `D1` if you want belt-and-braces; just pay for it with Fix A's lower threshold.
+~~Is `D1` removable?~~ **Answered definitively in §6.20 — yes.** Both downstream ICs have datasheet-specified reverse blocking (TPS2116 I_REV = **1 nA typ**; TP4056 states *"No blocking diode is required"* in its own Description). It does **not** protect against hot-plug overshoot — that's `CR1`'s job, and note that hot-plug ringing can reach ~2× VBUS, i.e. above the TPS2116's **6 V** and the TP4056's **8 V** absolute maximums, so confirm `CR1` actually clamps below 6 V.
 
 **Do *not* try to fix this with a capacitor on PR1.** It's the intuitive "safety net" but it's wrong here: on a real unplug you need the handover to complete before `C4`+`C6`+`C32` (≈66 µF) collapse, which at 500 mA allows only ~26 µs for a 200 mV droop. Any RC big enough to filter a millisecond-scale Wi-Fi TX sag (≥100 nF against the 76 kΩ divider ≈ 7.6 ms) would leave the rail unpowered far too long. The datasheet neither recommends nor discusses a PR1 capacitor. Keep PR1 fast and set the *threshold* correctly instead — limit any PR1 cap to ≤1 nF for noise only.
 
@@ -255,11 +258,21 @@ The dropout is `(V_IN − 3.3) × I`, so the fix is to reduce either term:
 
 Note this interacts with §3.1: the *worse* the LDO thermals, the more you want the mux to stay on USB (higher V_IN means more dissipation, but switching to battery at 3.7 V actually **reduces** LDO dissipation). Running from the battery is thermally *better* — another reason not to over-tune the threshold upward.
 
-### 3.3 ~~Boost output capacitor will derate badly~~ — ✅ FIXED (`C9` = 4.7 µF/50 V)
+### 3.3 ~~Boost output capacitor will derate badly~~ — ❌ **WITHDRAWN**. `C9` is correct at **1 µF/50 V 0805**
 
-`C9 = 1 µF`, annotated **50 V**, in an **0805** footprint. The TPS923610 reference design calls for `C_OUT = 1 µF`. An 0805 X7R 1 µF/50 V typically loses **60–70 % of its capacitance at 20 V DC bias** → you'll have ~0.3–0.4 µF where the datasheet wants 1 µF, which shows up as extra output ripple and worse LED current regulation.
+**Original claim:** `C9 = 1 µF` derates to ~0.3–0.4 µF at 20 V bias, so it should be raised to **2.2 µF/50 V 0805**. He briefly fitted 4.7 µF on that advice.
 
-**Fix:** use **2.2 µF/50 V 0805** (still ~0.7–0.9 µF derated) or a **1 µF/100 V in 1206**. Same applies to `C12` (4.7 µF C_IN) but at 3.3 V bias the derating is mild.
+**Why it was wrong.** The recommendation optimised for the wrong quantity. Three corrections, developed in §6.17:
+
+1. **The ripple it was protecting against is invisible.** The TPS923610 switches at **1.1 MHz**. Output ripple lands nine octaves above the flicker-perception band, and `C31` (100 n) filters it out of `LED_MONIT` before the ADC sees it. Ripple *magnitude* was never the figure of merit.
+2. **`R37` dominates the loop anyway.** The small-signal path from `LED_SW` to GND is `R37` (13.3 Ω) in series with the string's dynamic resistance (~17.2 Ω) ≈ 30.5 Ω. Even a heavily derated `C9` presents well under 1 Ω at 1.1 MHz, so the ripple current split into the LEDs is a fraction of a percent either way.
+3. **Bigger `C9` actively hurts the feature he cares about.** CCT blending slews `LED_SW` between the warm and cool forward voltages every `COLOR_SEL` half-period: `t = C·ΔV_f / I_LED`. **`I_LED` scales with the ADIM duty cycle**, so *low brightness is the worst case*. At 4.7 µF and 10 % brightness the transient exceeded the entire half-period — the blend would never settle and the two channels would never reach their commanded ratio.
+
+**Resolution: 1 µF/50 V, which is what TI's own reference design specifies.** Fitted. The derating the original note complained about is real but *beneficial* here, and the correct nominal is the datasheet's.
+
+> ⚠️ **Internal inconsistency to be aware of:** §6.17's arithmetic assumed ~0.75 µF effective for an 0805 1 µF/50 V at ~22 V, while the older note at §4 assumed ~0.35 µF. Murata SimSurfing data (§6.19) gives **0.187 µF** for the *0603* 1 µF/50 V X5R at 25 V; no measured curve for the 0805 part could be obtained. The true 0805 value is somewhere between. **This does not change the conclusion** — every correction above points the same direction (smaller effective C = faster blend, and ripple is irrelevant), so a lower-than-assumed effective capacitance *reinforces* the 1 µF choice rather than undermining it.
+
+`C12` (4.7 µF C_IN) sits at 3.3–5 V bias where derating is mild. No action.
 
 ### 3.4 ~~`D3` SMAJ30A~~ — ✅ FIXED (SMAJ26A fitted). Re-evaluation retained below
 
@@ -939,6 +952,262 @@ There is a real trade here and it should be resolved with a measurement rather t
 
 ---
 
+### 6.19 🟡 **NEW** — 0805 → 0603 migration audit
+
+Requested change: downsize every 0805 resistor and capacitor to 0603 to recover board area, excluding the fuse and the LED. Current population is **78 resistors + 35 capacitors + `F1`** in 0805 (`D2`, the power LED, is already 1206 and is untouched).
+
+#### 6.19.1 Resistors — all 78 can move. No exceptions.
+
+An initial automated pass flagged 20 resistors as exceeding an 0603's 100 mW rating. **That pass was wrong** — it assumed the full 3.3 V rail across every resistor, which is only valid for a resistor that actually bridges a rail to ground. Corrected:
+
+| Group | Real worst case | % of 0603 (100 mW) |
+|---|---|---|
+| `R21`–`R26`, `R29`–`R34`, `R65`, `R68`, `R69` (33 Ω series terminators) | Transient edge current only: `P = C·V²·f` = **6.5 mW** at 40 MHz SDIO, 15 pF load | 6 % |
+| `R60`, `R61`, `R63`, `R64` (100 Ω button series) | In series with a 10 kΩ pull-up, not across the rail: 327 µA → **11 µW** | 0.01 % |
+| `R14` (3 Ω, e-paper `RESE` sense) | `I_rms = I_pk·√(D/3)` → 97 mA at D = 0.7 → **28 mW** | **28 %** |
+| Everything else | ≤ 11 mW | ≤ 11 % |
+
+`R14` is the only resistor with meaningful dissipation and it still has 3.5× margin in 0603.
+
+**Working voltage:** a standard 0603 thick-film part is rated 50 V working / 100 V overload. Only one resistor on the board sees more than 5.5 V — **`R39`** (1 MΩ bleeder on `LED_SW`, up to 25 V), which is 2× margin. Clear.
+
+#### 6.19.2 Capacitors — the constraint is *available values*, not power
+
+Verified against Murata, Samsung Electro-Mechanics, TDK, Yageo, KEMET, Kyocera-AVX catalogs plus live LCSC stock. The relevant ceilings for 0603 (1608):
+
+| Rating | 0603 max capacitance | Notes |
+|---|---|---|
+| **50 V** | **2.2 µF** (X5R — Murata GRM188R61H225KE11D, LCSC C162273, 110 k stock). X7R ceiling is **1 µF** (Samsung CL10B105KB8NQNC, 2.39 M stock, cheap) | **4.7 µF/50 V in 0603 does not exist** from any manufacturer checked |
+| 25 V | 10 µF (GRM188R61E106MA73D) | 4.7 µF/25 V readily available |
+| 6.3 V | 47 µF | 22 µF/6.3 V is a JLCPCB **Basic Part** (CL10A226MQ8NRNC, 8 M stock) |
+
+DC-bias derating, from Murata SimSurfing exports (25 °C):
+
+| Part | 0 V | 3.3 V | 5 V | 25 V |
+|---|---|---|---|---|
+| 0603 22 µF/6.3 V X5R (GRM186R60J226ME15) | 16.2 µF | **6.67 µF** | **4.22 µF** | — |
+| 0805 22 µF/25 V X5R (GRM21BR61E226ME44) | 16.9 µF | **12.7 µF** | **9.54 µF** | — |
+| 0603 1 µF/50 V X5R (GRT188R61H105KE13) | 0.745 µF | — | 0.647 µF | **0.187 µF** |
+
+#### 6.19.3 Verdict per capacitor
+
+**Tier A — must stay 0805 (the value does not exist in 0603):**
+
+| Ref | Value | Node | Why |
+|---|---|---|---|
+| **`C11`** | 4.7 µF | `EINK_SW` ↔ `Net-(D4-K)`, ~23 V | **Charge-pump flying capacitor**, not decoupling. Pump output current is `I = C_eff·ΔV·f` — halving it halves VGL drive capability |
+| `C13` | 4.7 µF/50 V | J2 pin 20, 15 V | No 0603 part exists |
+| `C14` | 4.7 µF/50 V | `PREVGH`, +22 V | Gate-drive reservoir |
+| `C15` | 4.7 µF/50 V | J2 pin 22, −15 V | No 0603 part exists |
+| `C16` | 4.7 µF/50 V | `PREVGL`, −22 V | Gate-drive reservoir |
+| `C17` | 4.7 µF | J2 pin 5 (VGH), 22 V | No 0603 part exists |
+
+**Tier B — strongly recommend staying 0805 (value exists but capacitance collapses):**
+
+| Ref | Value | Node | 0603 effective | 0805 effective |
+|---|---|---|---|---|
+| `C4` | 22 µF | `LDO_IN`, 5 V | **4.2 µF** — and a 6.3 V part on a 5 V USB-derived rail has almost no headroom | ~9.5 µF |
+| `C6`, `C32` | 22 µF | `3V3` | 6.67 µF each | ~12.7 µF each |
+| `C9` | 1 µF/50 V | `LED_SW`, 25 V | **0.187 µF** | higher (unmeasured) |
+
+`C6`+`C32` are the bulk reservoir for an ESP32-S3 whose Wi-Fi TX bursts to ~350 mA. Moving both to 0603 cuts total 3V3 bulk from ~25 µF to ~13 µF effective. Brownout-on-associate is the classic ESP32 failure mode; this is not where to save 5 mm².
+
+**Tier C — your call (3 parts, modest loss):** `C18`, `C19`, `C20` (1 µF on J2 panel rails at ~15 V). A 0603 1 µF/50 V holds roughly 0.3 µF at that bias versus more for the 0805. These are decoupling for panel-generated rails rather than anything this board regulates, so the loss is tolerable — but they sit physically among the Tier-A parts anyway, so keeping the whole J2 high-voltage cluster at 0805 is tidier.
+
+**Tier D — move to 0603 freely (22 parts):** `C1`, `C2`, `C3`, `C5`, `C7`, `C8`, `C10`, `C12`, `C21`, `C22`, `C23`, `C24`, `C25`, `C26`, `C27`, `C28`, `C29`, `C30`, `C31`, `C33`, `C36`, `C37`. All are ≤ 5 V, ≤ 10 µF, and have plentiful 0603 equivalents at 16–25 V where derating is mild.
+
+#### 6.19.4 Area actually recovered
+
+KiCad `_HandSolder` courtyards:
+
+| Footprint | Courtyard | Area |
+|---|---|---|
+| `R_0805_2012Metric_Pad1.20x1.40mm_HandSolder` | 3.70 × 1.90 mm | 7.03 mm² |
+| `R_0603_1608Metric_Pad0.98x0.95mm_HandSolder` | 3.30 × 1.46 mm | 4.82 mm² (−31 %) |
+| `C_0805_2012Metric_Pad1.18x1.45mm_HandSolder` | 3.76 × 1.96 mm | 7.37 mm² |
+| `C_0603_1608Metric_Pad1.08x0.95mm_HandSolder` | 3.30 × 1.46 mm | 4.82 mm² (−35 %) |
+
+78 R + 22 C (Tiers D only) → **228 mm²** of courtyard recovered. Swapping all 35 caps instead would give 262 mm², so **keeping the 13 critical caps at 0805 costs only 13 % of the available saving.**
+
+Note the saving is mostly in **width**, not length: 1.90 → 1.46 mm (−23 %) versus 3.70 → 3.30 mm (−11 %). Rows of parts pack tighter; parts placed end-to-end barely gain. Worth checking that the density problem is actually the one this fixes.
+
+Also note the `_HandSolder` 0603 is only 0.34 mm longer than the plain 0603 and **identical in width**, so there is no density argument for giving up the extended pads. Keep the hand-solder variants.
+
+#### 6.19.5 ✅ Voltage-rating annotation gaps found during this audit — **CLOSED**
+
+Item 21 of §5 added `/50V` to `C13`–`C16` and `C20`. Two caps were missed at the time; **both have since been annotated and verified in the netlist:**
+
+* ✅ **`C17` (4.7 µF, J2 pin 5 / VGH, +22 V)** — now reads `4.7u/50V`.
+* ✅ **`C11` (4.7 µF, `EINK_SW` ↔ `Net-(D4-K)`)** — now reads `4.7u/50V`. This was the most stressed capacitor on the board and was never on the original list: unlike the reservoirs, which sit at a static DC bias, `C11` is a flying capacitor that swings the **full 0 → ~23 V every switching cycle**, so it sees continuous large-signal AC stress on top of the DC rating. **X7R is still preferred over X5R here** for that reason — worth specifying explicitly in the BOM rather than leaving it to the assembler.
+
+---
+
+### 6.20 🟡 **NEW** — `D1` (series Schottky on VBUS) is redundant and should be removed
+
+**Question asked:** *"Do I need D1?"* — **No.** Verified against primary datasheets.
+
+#### 6.20.1 What `D1` actually is
+
+Not a shunt/clamp. It is a **series reverse-blocking Schottky**, anode on the fuse output, cathode on `USB_VBUS`:
+
+```
+J1 VBUS → /VBUS_PRE (CR1 TVS) → F1 polyfuse → Net-(D1-A) → D1 (A→K) → USB_VBUS
+```
+
+Everything downstream therefore runs **one diode drop below actual VBUS**: `U2` VIN1+MODE (TPS2116), `U11` VCC+CE (TP4056), `R38` (the PR1 divider), `C2`/`C25`, and `D2`'s anode.
+
+#### 6.20.2 Both loads already block reverse current — with specified numbers
+
+**TPS2116** — TI SLVSFG1A §7.3.4 *Reverse Current Blocking*, plus §6.5 `I_REV`, which measures precisely this case (V_OUT = 5.5 V, V_INx = 0 V, V_INy open):
+
+| `I_REV` out of VINx | 25 °C | 85 °C | 105 °C |
+|---|---|---|---|
+| typ | **0.001 µA (1 nA)** | 0.05 µA | 0.15 µA |
+
+1 nA out of a grounded VIN pin with 5.5 V on VOUT is only possible with no forward-biased body-diode path. (TI gives typicals only — no max limit — and the block diagram is an image, so the back-to-back FET topology is *inferred*; the blocking behaviour itself is *verified numerically*.)
+
+**TP4056** — the datasheet answers this in its own Description, verbatim:
+
+> "No blocking diode is required due to the internal PMOSFET architecture and have prevent to negative Charge Current Circuit."
+
+Features list: *"No MOSFET, Sense Resistor or Blocking Diode Required."* The Chinese V1.3 datasheet says the same: 内部采用防倒充电路，不需要外部隔离二极管 ("internally uses an anti-reverse-charge circuit; no external isolation diode is required"). Sleep-mode `I_BAT` with **V_CC = 0** is **≤2 µA max**.
+
+Those two are the **only** parts on `USB_VBUS` capable of sourcing. `C2`/`C25` (11 µF total) and `R38` only sink; `D2`'s anode faces the rail.
+
+#### 6.20.3 USB compliance does not require a diode
+
+USB 2.0 §7.2.1: *"No device shall supply (source) current on VBUS at its upstream facing port at any time."* This is a **behavioural** requirement, not an implementation mandate — an integrated power-path mux with specified reverse blocking satisfies it, and 1 nA is orders of magnitude below anything a compliance test would flag.
+
+> ⚠️ **Separate compliance trap, unrelated to `D1`.** The same clause continues: *"They may not provide power to the pull-up resistor on D+/D− unless VBUS is present… When VBUS is removed, the device must remove power from the D+/D− pull-up resistor within 10 seconds."* The ESP32-S3 USB PHY is powered from `3V3`, which the TPS2116 supplies **from the battery** when USB is absent. A series Schottky on VBUS does not fix this. Mitigation is in firmware: `USB_STAT` already lets software detect USB presence (`ST` goes low on battery), so gate the USB peripheral on that. Low practical risk, but it is the real version of the concern `D1` appears to be aimed at.
+
+#### 6.20.4 What `D1` costs
+
+**B5819W in SOD-123** (CJ rev. D): `I_O` = 1 A, **P_d = 500 mW**, **RθJA = 200 °C/W**, `T_J(max)` = 125 °C, `V_F` ≤ **0.60 V @ 1 A** (the only guaranteed point — the V_F/I_F curve is a raster image, so mid-range values below are estimates ±0.05 V).
+
+`D1` carries **system current + charge current** combined:
+
+| I_total | V_F (est.) | P | ΔT @ 200 °C/W |
+|---:|---:|---:|---:|
+| 250 mA | ~0.30 V | 75 mW | 15 °C |
+| 500 mA | ~0.45 V | 225 mW | 45 °C |
+| 700 mA | ~0.47 V | 329 mW | **66 °C** |
+| 1 A | 0.60 V (max) | 600 mW | **exceeds the 500 mW rating** |
+
+500 mW is the rating *with zero margin at 25 °C ambient*, derating linearly to 0 W at 125 °C. **`F1` holds at 1.0 A — the fuse will pass a current that destroys the diode.**
+
+The thermal trade is bad in both directions. `D1` lowers TP4056 `V_CC`, moving ~40 mW off the charger — but adds `V_F × (I_sys + I_chg)` of its own. At 500 mA system load that is **+200 mW of new dissipation to save 40 mW**, deposited next to the charger it was supposedly helping.
+
+#### 6.20.5 The functional argument — `D1` blocks the fix for §3.1
+
+`R38` = 240 k, `R51` = 100 k, `V_REF` = 0.92/1.00/1.08 V → **V_switchover = 3.13 / 3.40 / 3.67 V**.
+
+The AP2112K needs **≥3.72 V** to hold 3V3 at 600 mA (§3.2). So a window exists where the mux holds the system on a sagging USB rail *while the LDO browns out*, with a healthy battery available. Raising `R38` is the fix — but `D1` eats the headroom that would allow it:
+
+| Source 4.75 V, `F1` at R1max | with `D1` | without `D1` |
+|---:|---:|---:|
+| 100 mA | 4.43 V | 4.73 V |
+| 500 mA | 4.20 V | 4.65 V |
+| 1 A | 3.94 V | 4.54 V |
+
+With `D1` removed, **`R38` = 300 k** gives V_switchover = **3.68 / 4.00 / 4.32 V** — worst-case threshold finally at the LDO's requirement, while still holding **+0.22 V margin at 1 A** from a worst-case 4.75 V source. With `D1` fitted that same setting fails outright (3.94 V < 4.32 V).
+
+#### 6.20.6 The one legitimate counter-argument
+
+This is **open hardware with builder-sourced parts, and counterfeit TP4056s are endemic.** A fake with a non-functional PMOS block could leak BAT→VCC→VBUS. The TPS2116 still blocks its own path, so this is the sole remaining exposure — a *sourcing* risk, not a design flaw.
+
+**Suggested compromise for the respin:** a **DNP SOD-123 in parallel with a fitted 0 Ω 0603**. Default build uses the link; anyone who doesn't trust their charger populates the diode and removes the jumper. One extra footprint, documents the decision on the board itself, and fits the project's BYO-parts philosophy.
+
+#### 6.20.7 Recommendation
+
+⬜ **Remove `D1`** (0 Ω link), **set `R38` = 300 k**, optionally keep the DNP diode escape hatch. Net effect: 0.3–0.6 V of rail headroom recovered, 200–600 mW of dissipation eliminated, a thermal over-stress removed, and the §3.1 brown-out window closed.
+
+---
+
 ## 7. Scope
 
-This is a **schematic** review — connectivity, part selection, values, margins and datasheet conformance. It does **not** cover layout. The board is 2-layer with native USB, ~26 MHz SDIO and two switching converters (the TPS923610 at 1.1 MHz and the e-paper charge pump); on two layers the return-path integrity under `SW`, `EINK_SW` and the USB pair is the dominant EMC risk and deserves its own review pass against the actual `.kicad_pcb`.
+This was a **schematic** review — connectivity, part selection, values, margins and datasheet conformance. Section 8 below adds placement/layout guidance, written at the point the schematic was essentially frozen and placement was beginning. It is guidance, **not** a review of an actual layout — no `.kicad_pcb` placement had been done when it was written.
+
+---
+
+## 8. Placement and layout guidance (2-layer)
+
+Written for the placement pass. The board is **2-layer** with native USB, 4-bit SDIO, and **two switching converters**. On two layers you have no dedicated ground plane under everything, so **return-path integrity is the dominant risk** and placement — not routing — is where it's won or lost.
+
+### 8.1 The governing constraint
+
+You have exactly one usable ground plane (bottom), and every signal you route on the bottom layer punches a hole in it. **Every bottom-layer track is a slot in the return path for whatever passes over it.** So the rule for this board is:
+
+> **Bottom layer is the ground plane. Route on top. Use the bottom only for short, deliberate crossings, and never under a switching node, the USB pair, or an analog ladder.**
+
+If you find yourself needing a long bottom-layer run, that is a signal to re-place, not to route.
+
+### 8.2 Place these first, in this order
+
+Placement order matters because the first three items have hard constraints and everything else is negotiable.
+
+**1. `U4` ESP32-S3-WROOM-1 antenna keepout.** Non-negotiable and set by Espressif: the antenna end must overhang the board edge, or have **no copper on any layer** beneath it — ground pour, tracks, and the bottom plane all removed. Get this wrong and you cannot fix it in firmware. Place the module first and let the keepout define the "dead zone" of the board.
+
+**2. The two switching loops** (§8.3) — these have the smallest allowable loop areas on the board.
+
+**3. `J1` USB-C and `J2` the 24-pin display FPC** — mechanically fixed by the enclosure; place them where the case requires and treat their positions as constraints.
+
+Everything else places around these four.
+
+### 8.3 The two hot loops — smallest loops on the board
+
+**a) TPS923610 LED boost (`U10`, 1.1 MHz).** Verified topology: `LDO_IN → L2 (4.7 µH) → 3031_SW → U10.SW(6)`, output on `U10.VOUT(5) → LED_SW`, with `C9` to GND and `R37` (13.3 Ω) setting current into `FB(3)`.
+
+The critical AC loop is **`U10.VOUT → C9 → GND → U10.GND(4)`**. At 1.1 MHz with fast edges this loop's area sets your radiated emissions and the SW-node ringing.
+
+* `C9` goes **directly across `U10` VOUT and GND**, on the top layer, shortest possible — before any other consideration.
+* `L2` close to `SW`, with the `SW` copper kept **small**. `SW` is the dV/dt aggressor; minimise its area rather than making it fat. It carries about 100 mA — it does not need width.
+* `R37` and the `FB` track are the **sensitive** node (200 mV full-scale). Keep `FB` short, away from `SW` and `LED_SW`, and return `R37`'s ground to `U10.GND` locally, not through the general pour.
+* `LED_SW` reaches **25 V**. Keep spacing to `I2C_SDA` on `J6` in mind (§3.8) and give it clearance from logic.
+
+**b) E-paper charge pump (`Q4`/`L1`).** Verified: `3V3 → L1 (22 µH) → EINK_SW → Q4(BSS138) D→S → /RESE → R14 (3 Ω) → GND`, with `EINK_SW —D5→ PREVGH` and the `C11` flying-capacitor leg to `D4`/`D6`.
+
+* The switched loop is **`L1 → Q4 → R14 → GND → 3V3 bulk (C6/C32)`**. Keep `Q4`, `R14` and the `3V3` bulk caps tight and co-located; this loop's return must not detour.
+* **`C11` is the flying capacitor**, not decoupling — it carries the full pump current every cycle. Place it tight against `D4`/`D5`/`D6`, not off in the decoupling group.
+* `EINK_SW` swings the full 0→23 V. It is the **second dV/dt aggressor** on the board. Keep it compact and keep the analog ladders (§8.5) away from it.
+* `/GDR` is a gate drive — keep it short.
+
+**These two loops should be physically separated from each other**, and both away from `U4`'s antenna and from the ADC group.
+
+### 8.4 Power path and the thermal cluster
+
+The chain is `J1 → F1 → D1 → USB_VBUS → {U11 TP4056, U2 TPS2116 VIN1}`, `P+ ← U11.BAT`, `U2.VIN2 ← P+`, `U2.VOUT → LDO_IN → U3 AP2112K → 3V3`.
+
+* ⬜ **Resolve `D1` before placing** (§6.20). If you remove it, the `F1 → USB_VBUS` run becomes a straight shot and the footprint disappears from the cluster. Deciding this *after* placement means redoing it.
+* **`U11` (TP4056) is the hottest part** at ~194 mW worst case, and it is an ESOP-8 that dissipates through its exposed pad. Give it the thermal-via field the footprint expects and a **generous copper pour** — the pad is the heatsink. Do not crowd it with `U3`.
+* **`U3` (AP2112K) is thermally limited** (§3.2, SOT-23-5, no pad, R_θJA 150–250 °C/W). It needs its own copper island. **Keep `U3` and `U11` apart** — they are the two heat sources and they are on the same rail.
+* `U2` (TPS2116) is a break-before-make mux: `C4` (22 µF) on `LDO_IN` is what holds the rail through the 8 µs handover, so place it **immediately at `U2.VOUT`**, not out with the LDO.
+* The battery protection (`U5` DW01A + `Q1` FS8205A) carries **full pack current**. `B−` and `GND` are separate nets joined only through `Q1` — keep that copper wide and short, and remember `Q1` pins 2/5 must stay soldered for thermal reasons even though they are the unconnected internal mid-node.
+
+### 8.5 Analog — five ADC nets that share the board with two switchers
+
+`BUTTON_ADC_1`, `BUTTON_ADC_2`, `PWR_BUTTON`, `BAT_MONIT`, `LED_MONIT`, plus the `USB_STAT` ladder. §6.6 proved the ladders pass worst-case tolerance — **that analysis assumed a clean board.** Coupled switching noise is the thing that would break them, because the button ladders decide *which button* by voltage level.
+
+* Route all six **on the top layer over unbroken ground**, as far from `EINK_SW`, `3031_SW` and `LED_SW` as the board allows.
+* Their filter caps (`C27`, `C28`, `C29` = 2.2 nF; `C31` = 100 nF; `C8` = 1 µF) belong **at the MCU pin**, not at the divider. The cap is there to present a low impedance to the ADC sampling instant.
+* `LED_MONIT` is the worst case: it is a divider off `LED_SW`, the 25 V switching output. `C31` (100 nF) does the work — keep it at `U4` pin 17 and keep the sense track off the boost loop.
+* `BAT_MONIT` is a P+/GND divider (an ESP32-safety choice, per earlier discussion). Long, quiet, low-current — route it last but route it clean.
+
+### 8.6 Digital buses
+
+* **USB `DP`/`DN`** — 90 Ω differential, matched, **over continuous ground**, as short as possible from `J1` to `U4` pins 13/14. `U6` (TPD4E1U06) must sit **at the connector**, not near the MCU; ESD protection placed downstream of the thing it protects is decorative. Do not route anything under this pair on the bottom layer.
+* **SDIO (4-bit)** — `CLK`, `CMD`, `D0`–`D3` with 33 Ω series terminators. Place the **resistors at the ESP32 end** (source termination only works at the source). Keep the six roughly length-matched; at 26–40 MHz exact matching is unnecessary but a wild outlier on `CLK` is not. `SD_VDD` is gated by `Q7` — keep `C36`/`C37` on the **switched** side, at the card.
+* **`J2` display FPC** — the ±15/±22 V rails and the SPI group share this connector. Keep the HV cluster (`C11`, `C13`–`C17`, `C20`, `D4`–`D6`) together near `J2` and keep the SPI group away from `EINK_SW`.
+* **I²C** — `R47`/`R48` (2.2 k) anywhere on the net; the bus is slow and short.
+
+### 8.7 Before you route
+
+* ⬜ Decide `D1` (§6.20) — it changes the power-path footprint set
+* ⬜ Confirm the 13 caps still at 0805 (§6.19.3) are placed as 0805; the other 100 parts are now 0603
+* ⬜ Set up net classes with wider tracks for `P+`, `B−`, `GND`, `LDO_IN`, `3V3` and the `J2` HV rails before routing, not after
+* ⬜ `H1`–`H4` are all `MountingHole_Pad` tied to GND (§6.18) — if the enclosure ends up conductive, consider one solid and three isolated
+* ⬜ Regenerate the BOM/netlist/gerbers; the committed artifacts are stale relative to the current schematic
+
+### 8.8 What this section is not
+
+This is placement *guidance* derived from the schematic and the parts' datasheets. It has **not** been checked against a real layout, no DRC has been run, and no field solving or impedance calculation was performed. Treat §8 as a checklist to place against, then have the finished layout reviewed on its own terms.
+

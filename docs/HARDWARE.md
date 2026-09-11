@@ -147,6 +147,8 @@ resistors (not one shared) is correct — it lets the source determine cable ori
 - **`F1` `0805L100WR`** — 1.0 A hold / 1.95 A trip PPTC. Resettable overcurrent protection.
 - **`D1` B5819W** — Schottky blocking diode preventing back-feed into the connector.
 
+> ⚠️ **`D1` is under review for removal.** The design review ([DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §6.20) found it redundant: the TPS2116 specifies reverse leakage of **1 nA typ** out of an unselected input, and the TP4056 datasheet states outright that *"No blocking diode is required due to the internal PMOSFET architecture."* Both paths off `USB_VBUS` therefore already block. Meanwhile `D1` drops 0.3–0.6 V, and at the ~1 A `F1` will pass it exceeds its own SOD-123 500 mW rating. If it is removed in a later revision, this chain becomes `VBUS_PRE → F1 → USB_VBUS` and `R38` rises to 300 k.
+
 **Shield handling:** `R1` (1 MΩ) ∥ `C1` (1 nF) from shell to GND. The classic arrangement —
 DC-isolates chassis from signal ground (breaking ground loops) while giving high-frequency
 noise a low-impedance path. Common on any board where the shell may touch an enclosure.
@@ -969,8 +971,8 @@ left edge.
 
 | Type | Count | Notable |
 |---|---:|---|
-| Resistors | 78 | incl. 12× 33 Ω series, 6× DNP config jumpers |
-| Capacitors | 35 | incl. 6× 50 V-rated HV |
+| Resistors | 78 | all **0603**; incl. 12× 33 Ω series, 6× DNP config jumpers |
+| Capacitors | 35 | 22× **0603**, 13× **0805** (HV / bulk — see below); 7× 50 V-rated |
 | ICs | 13 | see below |
 | Switches | 11 | 8 ladder + power + reset + boot |
 | Diodes | 7 | 4× B5819W, SMAJ26A, PESD2IVN-UX, LED |
@@ -980,8 +982,19 @@ left edge.
 | Mounting | 4 | plated, GND |
 | TVS | 3 | TSD05CDYFR |
 | Inductors | 2 | 22 µH (charge pump), 4.7 µH (frontlight) |
-| Fuse | 1 | 0805L100WR PPTC |
+| Fuse | 1 | 0805L100WR PPTC (0805) |
 | **Total** | **173** | |
+
+**Passive case sizes.** The board standardised on **0603** for hand-solderability at the smallest size still comfortable to assemble by hand. **Thirteen capacitors remain 0805** because the required value does not exist in 0603, or because DC-bias derating would gut it:
+
+| Refs | Value | Reason |
+|---|---|---|
+| `C11`, `C13`–`C17` | 4.7 µF @ 15–23 V | **4.7 µF/50 V does not exist in 0603** from any manufacturer. The 0603/50 V ceiling is 2.2 µF (X5R) / 1 µF (X7R) |
+| `C4`, `C6`, `C32` | 22 µF | 0603 22 µF/6.3 V delivers only **6.7 µF at 3.3 V** and 4.2 µF at 5 V, vs ~12.7 µF for the 0805 part |
+| `C9` | 1 µF/50 V | Boost output; 0603 holds ~0.19 µF at 25 V bias |
+| `C18`–`C20` | 1 µF @ 15 V | Kept with the rest of the `J2` high-voltage cluster |
+
+`F1` (fuse) stays 0805 and `D2` (power LED) is 1206. Full analysis in [DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §6.19.
 
 **Integrated circuits:**
 
