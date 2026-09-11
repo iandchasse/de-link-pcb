@@ -20,11 +20,11 @@ What's left is a set of **value / margin / documentation defects**, several of w
 * ~~a CMOS inverter input floats at boot~~ ✅ **fixed** (`R75` 100 k)
 * ~~the USB-priority threshold is set above the voltage USB_VBUS reaches under load~~ ✅ **fixed** (`R38`=240 k)
 * ⬜ **the 3.3 V LDO reaches thermal shutdown around 300–400 mA, and the LED boost still runs through it** — the `Q7` deletion (§6.14) fixes this
-* ~~**the ±15–22 V e-paper capacitors have no specified voltage rating**~~ ✅ **fixed** — all of `C11`, `C13`–`C17`, `C20` now carry `/50V`
-* ⬜ **`D1` (series Schottky on VBUS) is redundant** — both downstream ICs have datasheet-specified reverse blocking, and the TP4056 datasheet literally says *"No blocking diode is required."* It costs 0.3–0.6 V of rail headroom, exceeds its own SOD-123 power rating at the current `F1` will pass, and blocks the proper fix for §3.1. See §6.20. **This is the last open electrical question on the schematic.**
+* ~~**the ±15–22 V e-paper capacitors have no specified voltage rating**~~ ✅ **mostly fixed** — `C13`–`C17` and `C20` carry `/50V`; ⬜ **`C11` has reverted to plain `4.7u`** and should be restored (§6.19.5)
+* ~~**`D1` (series Schottky on VBUS) is redundant**~~ ✅ **RESOLVED** — `D1` removed and `R38` raised to 300 k. `F1` now feeds `USB_VBUS` directly; switchover is **3.68 / 4.00 / 4.32 V**, which clears the LDO's 3.72 V requirement while holding +0.22 V margin at 1 A (§6.20)
 * ~~**ERC still reports 1 error**~~ ✅ **fixed** — ERC is now **0 errors, 40 cosmetic warnings**
 
-**Status at the close of this review:** the schematic is otherwise complete. `D1` (§6.20) is the only outstanding electrical decision; §2.2/§2.3 are documentation-comment edits; §3.5.1 (`L1` replacement) was resolved by part-number update. Placement/layout guidance is in **§8**.
+**Status at the close of this review:** the schematic is electrically complete — every 🔴 and 🟡 item is resolved or consciously declined. Remaining ⬜ items are the `C11` annotation, two documentation-comment edits (§2.2/§2.3), and regenerating the stale BOM/netlist/gerbers. Placement/layout guidance is in **§8**.
 
 Full status table in **section 5**; per-block detail in **section 6**.
 
@@ -1033,12 +1033,14 @@ Note the saving is mostly in **width**, not length: 1.90 → 1.46 mm (−23 %) v
 
 Also note the `_HandSolder` 0603 is only 0.34 mm longer than the plain 0603 and **identical in width**, so there is no density argument for giving up the extended pads. Keep the hand-solder variants.
 
-#### 6.19.5 ✅ Voltage-rating annotation gaps found during this audit — **CLOSED**
+#### 6.19.5 🟡 Voltage-rating annotation gaps found during this audit — **one regression**
 
-Item 21 of §5 added `/50V` to `C13`–`C16` and `C20`. Two caps were missed at the time; **both have since been annotated and verified in the netlist:**
+Item 21 of §5 added `/50V` to `C13`–`C16` and `C20`. Two caps were missed at the time; both were subsequently annotated, but **one has since reverted:**
 
-* ✅ **`C17` (4.7 µF, J2 pin 5 / VGH, +22 V)** — now reads `4.7u/50V`.
-* ✅ **`C11` (4.7 µF, `EINK_SW` ↔ `Net-(D4-K)`)** — now reads `4.7u/50V`. This was the most stressed capacitor on the board and was never on the original list: unlike the reservoirs, which sit at a static DC bias, `C11` is a flying capacitor that swings the **full 0 → ~23 V every switching cycle**, so it sees continuous large-signal AC stress on top of the DC rating. **X7R is still preferred over X5R here** for that reason — worth specifying explicitly in the BOM rather than leaving it to the assembler.
+* ✅ **`C17` (4.7 µF, J2 pin 5 / VGH, +22 V)** — reads `4.7u/50V`. Confirmed.
+* ⬜ **`C11` (4.7 µF, `EINK_SW` ↔ `Net-(D4-K)`)** — was annotated `4.7u/50V`, **now reads plain `4.7u` again.** `C13`–`C17` and `C20` all retained theirs, so this looks like an accidental revert rather than a decision.
+
+`C11` is the one that least deserves to lose its rating. Unlike the reservoir caps, which sit at a static DC bias, it is a **flying capacitor that swings the full 0 → ~23 V every switching cycle**, so it sees continuous large-signal AC stress on top of the DC rating. It needs an explicit **50 V**, and **X7R is preferred over X5R** here for exactly that reason — worth stating in the BOM rather than leaving it to whatever an assembler picks for "4.7u".
 
 ---
 
@@ -1117,13 +1119,59 @@ This is **open hardware with builder-sourced parts, and counterfeit TP4056s are 
 
 **Suggested compromise for the respin:** a **DNP SOD-123 in parallel with a fitted 0 Ω 0603**. Default build uses the link; anyone who doesn't trust their charger populates the diode and removes the jumper. One extra footprint, documents the decision on the board itself, and fits the project's BYO-parts philosophy.
 
-#### 6.20.7 Recommendation
+#### 6.20.7 ✅ Recommendation — **IMPLEMENTED**
 
-⬜ **Remove `D1`** (0 Ω link), **set `R38` = 300 k**, optionally keep the DNP diode escape hatch. Net effect: 0.3–0.6 V of rail headroom recovered, 200–600 mW of dissipation eliminated, a thermal over-stress removed, and the §3.1 brown-out window closed.
+✅ **`D1` removed** (`F1` now feeds `USB_VBUS` directly) and **`R38` raised to 300 k**. Verified in the netlist: 169 components / 126 nets, ERC 0 errors.
+
+New switchover threshold: **3.68 / 4.00 / 4.32 V** (min/typ/max over `V_REF` tolerance). That finally puts the worst case at the AP2112K's 3.72 V requirement while holding **+0.22 V margin at 1 A** from a worst-case 4.75 V source — the §3.1 brown-out window is closed. Net effect: 0.3–0.6 V of rail headroom recovered, 200–600 mW of dissipation eliminated, and a thermal over-stress removed.
+
+The DNP-diode-in-parallel-with-0 Ω escape hatch (§6.20.6) was **not** fitted. If counterfeit TP4056s become a reported problem in the wild, that is the cheap retrofit.
 
 ---
 
-## 7. Scope
+### 6.21 🟢 **NEW** — charge current raised to ~255 mA (`R6` 12 k → 4.7 k)
+
+`R6` sets the TP4056's constant-current phase. `I_BAT ≈ 1200 / R_PROG(kΩ)` → **4.7 k ≈ 255 mA** (the manufacturer's own table is slightly non-linear and suggests ~250–260 mA in this region; the two published datasheets disagree on whether the constant is 1100 or 1200, so treat this as 235–255 mA).
+
+**Thermal check — passes comfortably.** §6.11 computed the ESOP-8 with its thermal-via field at ~2.5× the old 100 mA figure:
+
+| Cell voltage | P_charger @ 255 mA | ΔT |
+|---|---|---|
+| 3.0 V (worst case, depleted) | ~500 mW | ~+20 °C |
+| 3.7 V | ~330 mW | ~+13 °C |
+| 4.2 V (taper) | ~200 mW | ~+8 °C |
+
+Well inside the 125 °C thermal-regulation point, and the part self-regulates current if it ever gets there.
+
+**Two consequences worth knowing:**
+
+1. **USB load increases.** Charge current now adds ~255 mA on top of system draw. With `D1` gone the rail has the headroom for it (§6.20.5 table: 4.65 V at 500 mA), so this is fine — but it is precisely why removing `D1` first mattered.
+2. **Check the cell's C-rate.** 255 mA is safe for most 1000 mAh+ cells (0.25C) but is aggressive for a small 300–500 mAh pack. Since the project is explicitly **battery-agnostic**, this is worth a sentence in the build docs: `R6` is the knob, and small cells want it left at 12 k.
+
+---
+
+### 6.22 🟢 **NEW** — GPIO reassignment (6 pins) — verified safe
+
+Six `U4` pins were swapped during placement, presumably to shorten routes. All verified against the ESP32-S3 pin capabilities:
+
+| Module pin | GPIO | Was | Now |
+|---|---|---|---|
+| 17 | IO9 | `LED_MONIT` | `USB_STAT` |
+| 18 | IO10 | `TP_INT` | `SD_ACTIVATE` |
+| 33 | IO40 | `PWM_LED` | `COLOR_SEL` |
+| 34 | IO41 | `SD_ACTIVATE` | `TP_INT` |
+| 35 | IO42 | `COLOR_SEL` | `PWM_LED` |
+| 38 | IO2 | `USB_STAT` | `LED_MONIT` |
+
+**ADC1 constraint holds.** ADC2 is unusable while Wi-Fi is active, so every analog net must land on ADC1 (IO1–IO10). After the swap: `BUTTON_ADC_1`→IO1, `BUTTON_ADC_2`→IO4, `BAT_MONIT`→IO8, `USB_STAT`→IO9, `LED_MONIT`→IO2. **All ADC1.** ✔ (`PWR_BUTTON` on IO18 is digital — pull-down `R76` plus `C29`, read as a logic level, not sampled — so ADC2 is irrelevant there.)
+
+**No strapping pins disturbed.** IO0, IO3, IO45, IO46 are the straps; none of the six moved pins touches them. ✔
+
+**Boot-glitch exposure improved.** §2.5 flagged that IO42 has no internal pull at reset and is *driven* low for ~60 µs at power-up. `COLOR_SEL` used to sit there — a glitch on the CCT select line. It has moved to IO40, and **`PWM_LED` now occupies IO42 instead, which is strictly better**: a transient low on the boost's ADIM pin means *LED off*, which is the safe state. `R75` (100 k pull-down) follows the `COLOR_SEL` net, so the §2.5 fix moved with it. ✔
+
+**One note:** IO40/41/42 are the JTAG pins (MTDO/MTDI/MTMS). Fine for normal operation, but if you ever want hardware JTAG debug, `COLOR_SEL`, `TP_INT` and `PWM_LED` are the three signals that will conflict. USB-Serial-JTAG on IO19/IO20 is unaffected and remains the practical debug path.
+
+Also note IO10 (an ADC1-capable pin) now carries `SD_ACTIVATE`, a digital output. Not an error — you have ADC1 pins to spare — just a mild waste of an analog-capable pin if you ever want a sixth analog input.
 
 This was a **schematic** review — connectivity, part selection, values, margins and datasheet conformance. Section 8 below adds placement/layout guidance, written at the point the schematic was essentially frozen and placement was beginning. It is guidance, **not** a review of an actual layout — no `.kicad_pcb` placement had been done when it was written.
 

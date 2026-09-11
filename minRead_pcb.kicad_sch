@@ -11904,7 +11904,7 @@
 		)
 		(uuid "c625c026-48ba-4146-9ce8-bfc15bb00155")
 	)
-	(text "R6 12kohm -> 100mA charge rate"
+	(text "R6 4.7kohm -> 255mA charge rate"
 		(exclude_from_sim no)
 		(at 149.098 123.952 0)
 		(effects
@@ -11954,6 +11954,16 @@
 			)
 		)
 		(uuid "fbd3337b-3c99-437b-841e-8c9f98245eb1")
+	)
+	(text "used to be a schottky diode on VBUS \nbut removed due to tp4056 blocking reverse \ncurrent"
+		(exclude_from_sim no)
+		(at 63.754 68.834 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "fc74d796-cf19-4e6e-a38e-335cfe16184e")
 	)
 	(text_box "TPS923 chip is a series LED boost converter. \nRecommended to run between 10kHz-25kHz via PWM_LED for brightness control.\nReturn path for LEDs is toggled via COLOR_SEL for warm/cool selection.\nFeedback current is 15mA tuned via R37. Reference datasheet to change as needed.\nLED_MONIT is analog signal that references 0-24.5V output on LED voltage. (ADC range from 0 to ~30V)\nInternal OVP should cut out at ~24V, but software protection should kick in and disable LED_ACTIVATE at safe voltage above known forward voltage (15V)"
 		(exclude_from_sim no)
@@ -13479,7 +13489,7 @@
 	)
 	(wire
 		(pts
-			(xy 57.15 30.48) (xy 58.42 30.48)
+			(xy 57.15 30.48) (xy 67.31 30.48)
 		)
 		(stroke
 			(width 0)
@@ -13826,16 +13836,6 @@
 			(type default)
 		)
 		(uuid "55240d64-1aa6-4ffd-8cb2-d83b81a3c027")
-	)
-	(wire
-		(pts
-			(xy 66.04 30.48) (xy 67.31 30.48)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "559e258c-b48d-4ccc-9709-b654dd17e5d0")
 	)
 	(wire
 		(pts
@@ -16627,7 +16627,7 @@
 		)
 		(uuid "381a0492-ca38-4bd2-a24b-3827e09494ab")
 	)
-	(label "PIN_5"
+	(label "PIN_6"
 		(at 355.6 393.7 0)
 		(effects
 			(font
@@ -16797,7 +16797,7 @@
 		)
 		(uuid "b667964e-8fbe-43cf-80c6-a4b5ad6e0e81")
 	)
-	(label "PIN_6"
+	(label "PIN_5"
 		(at 355.6 387.35 0)
 		(effects
 			(font
@@ -17319,22 +17319,22 @@
 	)
 	(global_label "SD_ACTIVATE"
 		(shape input)
-		(at 514.35 217.17 0)
+		(at 483.87 214.63 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right)
 		)
 		(uuid "1811d9ba-3bc9-4f07-97b9-7403eeb98cef")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 529.0071 217.17 0)
+			(at 469.2129 214.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -17451,7 +17451,7 @@
 	)
 	(global_label "LED_MONIT"
 		(shape input)
-		(at 483.87 212.09 180)
+		(at 483.87 194.31 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -17461,7 +17461,7 @@
 		)
 		(uuid "1f1fa019-111b-484d-bdf6-4791332a8e6a")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 470.7853 212.09 0)
+			(at 470.7853 194.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19292,22 +19292,22 @@
 	)
 	(global_label "TP_INT"
 		(shape input)
-		(at 483.87 214.63 180)
+		(at 514.35 217.17 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "a1fe92dd-604f-44b7-8214-2cfa78008f75")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 474.7767 214.63 0)
+			(at 523.4433 217.17 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -19732,7 +19732,7 @@
 	)
 	(global_label "PWM_LED"
 		(shape input)
-		(at 514.35 214.63 0)
+		(at 514.35 219.71 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -19742,7 +19742,7 @@
 		)
 		(uuid "b6e9429c-fe53-4ebd-ba78-6c4087b4231a")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 525.9227 214.63 0)
+			(at 525.9227 219.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19776,7 +19776,7 @@
 	)
 	(global_label "COLOR_SEL"
 		(shape input)
-		(at 514.35 219.71 0)
+		(at 514.35 214.63 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -19786,7 +19786,7 @@
 		)
 		(uuid "b9215917-2ae4-4383-aaff-e9231936d0ca")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 527.9185 219.71 0)
+			(at 527.9185 214.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -20260,7 +20260,7 @@
 	)
 	(global_label "USB_STAT"
 		(shape input)
-		(at 483.87 194.31 180)
+		(at 483.87 212.09 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -20270,7 +20270,7 @@
 		)
 		(uuid "df43f835-0739-4784-8179-93a36c904d3e")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 471.8739 194.31 0)
+			(at 471.8739 212.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22279,7 +22279,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "240k"
+		(property "Value" "300k"
 			(at 163.83 52.0699 0)
 			(effects
 				(font
@@ -28815,73 +28815,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:MBR0530")
-		(at 62.23 30.48 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "702dacbe-804f-473d-a417-9edafad76c0d")
-		(property "Reference" "D1"
-			(at 62.738 24.892 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "B5819W"
-			(at 63.246 27.178 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Diode_SMD:D_SOD-123"
-			(at 62.23 26.035 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://www.mccsemi.com/up_pdf/MBR0520~MBR0580(SOD123).pdf"
-			(at 62.23 30.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "30V 0.5A Schottky Power Rectifier Diode, SOD-123"
-			(at 62.23 30.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "60a3c0c6-f179-4d73-996a-37d83b28fa91")
-		)
-		(pin "1"
-			(uuid "0ba2d9ba-1c47-4628-958d-9d7157ae2cc0")
-		)
-		(instances
-			(project "minRead_pcb"
-				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
-					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 532.13 113.03 180)
 		(unit 1)
@@ -29184,7 +29117,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "12k"
+		(property "Value" "4.7k"
 			(at 142.24 110.4899 0)
 			(effects
 				(font
@@ -38503,7 +38436,7 @@
 				)
 			)
 		)
-		(property "Value" "4.7u/50V"
+		(property "Value" "4.7u"
 			(at 55.88 292.1 90)
 			(effects
 				(font

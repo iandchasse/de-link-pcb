@@ -322,7 +322,7 @@ drive the ADC pin negative. The cost is a small load-dependent offset — ~7 mV 
 
 ![USB status ladder](images/17-usb-status.png)
 
-Three open-drain status signals are encoded onto **one ADC pin** (`IO2`) through a resistor
+Three open-drain status signals are encoded onto **one ADC pin** (`IO9`) through a resistor
 ladder — a neat piece of pin economy.
 
 Each asserted signal pulls its resistor to ground against the 100 kΩ pull-up (`R70`), and
@@ -401,7 +401,7 @@ are bidirectional and must idle high, while CLK is always driven and needs no pu
 ### Power gating
 
 The card's `VDD` is **switched**, not hard-wired — `Q7` (AO3419 P-FET) with `R40` (100 k)
-holding the gate off by default, driven from `IO41` (`SD_ACTIVATE`) through `R78` (1 k). The
+holding the gate off by default, driven from `IO10` (`SD_ACTIVATE`) through `R78` (1 k). The
 schematic states the polarity plainly: *"SD_ACTIVATE HIGH (default) = OFF, SD_ACTIVATE LOW =
 ON."*
 
@@ -420,7 +420,7 @@ reset; 100 k gives ~400 ms, or ~8 ms if firmware also drives the data lines low 
 the schematic explicitly requires: *"All data signals should be asserted low before shutting
 down."*
 
-`IO41` is a good choice for this: not a strapping pin, not in the ESP32-S3 power-up glitch
+`IO10` is a good choice for this: not a strapping pin, not in the ESP32-S3 power-up glitch
 table, and it comes out of reset with no internal pull — so the 100 k pull-up wins
 uncontested and the card is unpowered until firmware asks for it.
 
@@ -539,7 +539,7 @@ ceiling, with the remaining headroom absorbing the higher-V_f strings on other p
 This is the most distinctive circuit on the board. Both LED strings share **one boost and one
 sense resistor**; colour is selected by choosing which string's return path is closed:
 
-- `COLOR_SEL` (`IO42`) → `Q5` gate (warm)
+- `COLOR_SEL` (`IO40`) → `Q5` gate (warm)
 - `COLOR_SEL` → `U12` (74LVC1G04 inverter) → `COLOR_SEL_INV` → `Q6` gate (cool)
 
 Because `U12` inverts, **exactly one string ever conducts.** Using an inverter rather than two
@@ -606,7 +606,7 @@ a reading light.
 
 ### Brightness
 
-`PWM_LED` (`IO40`) drives `ADIM`. Despite being a PWM input, this is **analog** dimming: the
+`PWM_LED` (`IO42`) drives `ADIM`. Despite being a PWM input, this is **analog** dimming: the
 part chops its internal 200 mV reference at the PWM duty cycle and low-pass filters it, so
 `V_FB = duty × 200 mV` and the LED current is genuinely DC. **No visible flicker** — which
 matters a great deal for a reading light. The datasheet's recommended range is 10–200 kHz.
@@ -615,7 +615,7 @@ matters a great deal for a reading light. The datasheet's recommended range is 1
 
 ### Monitoring & protection
 
-`R39`/`R41` (1 M / 120 k) divide `LED_SW` into `LED_MONIT` (`IO9`) with `C31` (100 nF), letting
+`R39`/`R41` (1 M / 120 k) divide `LED_SW` into `LED_MONIT` (`IO2`) with `C31` (100 nF), letting
 firmware watch the boost output and implement a software over-voltage limit above the LED
 string's known forward voltage. `D3` (SMAJ26A) clamps transients at the connector, and `D8`
 (PESD2IVN-UX) protects the return lines.
@@ -637,7 +637,7 @@ string's known forward voltage. `D3` (SMAJ26A) clamps transients at the connecto
 Optional block for `-FT01C`-class panels with bonded capacitive touch.
 
 `J4` is a 6-pin 0.5 mm ZIF carrying **GND, VDD, RST, INT, SDA, SCL** — a standard I²C touch
-controller interface. `TP_RST` (`IO11`) and `TP_INT` (`IO10`) are dedicated pins; SDA/SCL join
+controller interface. `TP_RST` (`IO11`) and `TP_INT` (`IO41`) are dedicated pins; SDA/SCL join
 the shared I²C bus. `U7` (TPD4E1U06) provides ESD protection on all four signal lines.
 
 ![Touch jumper mux](images/15b-touch-jumpers.png)
@@ -853,8 +853,8 @@ Every ESP32-S3 pin, as used:
 | 14 | IO20 | `DP` | USB D+ |
 | 15 | IO3 | — | Spare → `J6` pin 9 |
 | 16 | IO46 | — | Spare → `J6` pin 2 |
-| 17 | IO9 | `LED_MONIT` | Frontlight voltage (ADC1_CH8) |
-| 18 | IO10 | `TP_INT` | Touch interrupt |
+| 17 | IO9 | `USB_STAT` | Charger status ladder (ADC1_CH8) |
+| 18 | IO10 | `SD_ACTIVATE` | microSD power gate |
 | 19 | IO11 | `TP_RST` | Touch reset |
 | 20 | IO12 | — | EPD SDI (via `R29`) |
 | 21 | IO13 | — | EPD SCLK (via `R30`) |
@@ -867,12 +867,12 @@ Every ESP32-S3 pin, as used:
 | 28–30 | IO35–37 | `IO3x_PSRAM` | Octal PSRAM on `R8` — free GPIO on other variants; `TP5`/`TP4`/`TP3` |
 | 31 | IO38 | `I2C_SDA` | I²C data |
 | 32 | IO39 | `I2C_SCL` | I²C clock |
-| 33 | IO40 | `PWM_LED` | Frontlight brightness |
-| 34 | IO41 | `SD_ACTIVATE` | microSD power gate |
-| 35 | IO42 | `COLOR_SEL` | Frontlight warm/cool |
+| 33 | IO40 | `COLOR_SEL` | Frontlight warm/cool |
+| 34 | IO41 | `TP_INT` | Touch interrupt |
+| 35 | IO42 | `PWM_LED` | Frontlight brightness |
 | 36 | RXD0 | `RX` | UART0 → `TP1` |
 | 37 | TXD0 | `TX` | UART0 → `TP2` |
-| 38 | IO2 | `USB_STAT` | Status ladder (ADC1_CH1) |
+| 38 | IO2 | `LED_MONIT` | Frontlight voltage sense (ADC1_CH1) |
 | 39 | IO1 | `BUTTON_ADC_1` | Bottom button ladder (ADC1_CH0) |
 
 **All five analog signals are on ADC1.** ADC2 is unusable while Wi-Fi is active on the
