@@ -1173,6 +1173,46 @@ Six `U4` pins were swapped during placement, presumably to shorten routes. All v
 
 Also note IO10 (an ADC1-capable pin) now carries `SD_ACTIVATE`, a digital output. Not an error — you have ADC1 pins to spare — just a mild waste of an analog-capable pin if you ever want a sixth analog input.
 
+### 6.23 🟢 **NEW** — LDO alternatives for lower quiescent current (`U3` AP2112K, battery-life study)
+
+Assessed for a **500 mAh single-cell LiPo** build. The goal is more battery life without giving up stability, so this stays an **LDO** (a buck-boost was considered and set aside — a switching node on the 3V3 rail would inject ripple into the ratiometric button ladders and the RF supply on a 2-layer board). The AP2112K's **55 µA quiescent current is the single largest term in the ~90 µA standby budget** (§2.5 table), so a lower-Iq LDO is the cheapest lever available.
+
+#### The ceiling, and where it matters
+
+Standby cell current = **35 µA non-LDO floor + Iq_LDO** (13 µA `USB_STAT` ladder + 4 µA gate divider + 2 µA `BAT_MONIT` + 3 µA DW01A + ~13 µA ESP32-S3 deep sleep). Because of that floor, standby is capped near **595 days even at 0 µA** — so single-digit-µA parts capture nearly all the achievable benefit; a nanopower part is unnecessary.
+
+| Part | Iq (typ) | Cell sleep | Standby (500 mAh) | vs AP2112K |
+|---|---:|---:|---:|---:|
+| AP2112K (current) | 55 µA | 90 µA | 231 d (7.6 mo) | — |
+| MIC5504-3.3 | 38 µA | 73 µA | 285 d (9.4 mo) | +23% |
+| TLV75533P | 25 µA | 60 µA | 347 d (11.4 mo) | +50% |
+
+**Important scope limit:** this gain is real only in **standby-dominated** use (device asleep for weeks). Modeled at 15 min/day reading the spread across all candidates collapses to ~9%, and at 1 h/day to ~2%, because the reading load dominates and LDO conversion efficiency (`Vout/Vin`) is identical across all LDOs. So this swap is a *shelf-life* improvement, not a *runtime-per-charge* improvement.
+
+#### 600 mA → 500 mA is inconsequential for our loading
+
+The heavy consumer — the TPS923610 frontlight boost, ~131 mA — runs from **`LDO_IN`, upstream of the LDO** (HARDWARE.md §3.5), so it never loads `U3`. The LDO feeds only the digital 3V3 domain: ESP32-S3 (~350 mA TX peak, ~150 mA avg, carried on the ~25 µF of 3V3 bulk), the e-paper charge pump during refresh, and gated microSD write bursts. Worst-case *average* is ~250 mA, and firmware already avoids running TX + refresh + SD concurrently (§3.2). Critically, the AP2112K's 600 mA was **never usable sustained** — in SOT-23-5 it thermally folds back at ~300–400 mA (§3.2), the same wall any SOT-23-5 alternative hits. So the 500 vs 600 mA nameplate difference sits below the package's real ceiling and is moot.
+
+#### Candidates — sourcing is the deciding factor
+
+| Part | Vendor | Pkg | Pinout vs AP2112K | Drop-in? | I_max | Iq | LCSC | Sourcing |
+|---|---|---|---|---|---:|---:|---:|---|
+| **AP2112K-3.3** (baseline) | Diodes | SOT-23-5 | `1 VIN·2 GND·3 EN·4 NC·5 VOUT` | — | 600 mA | 55 µA | ~$0.085 | active |
+| **TLV75533PDBVR** | TI | SOT-23-5 | `1 OUT·2 GND·3 EN·4 NC·5 IN` — **1↔5 swapped** | ⚠️ reroute | 500 mA | 25 µA | **~$0.080** (C404027, 51 k stock) | active, single MPN |
+| **MIC5504-3.3YM5-TR** | Microchip | SOT-23-5 | `1 VIN·2 GND·3 EN·4 NC·5 VOUT` — **identical** | ✅ yes | 300 mA | 38 µA | ~$0.118 (C88419, 47 k stock) | active, single MPN |
+| ~~RT9013-33GB~~ | Richtek | SOT-23-5 | identical | ✅ yes | 500 mA | 25 µA | ~$0.074 | **rejected** — `-GB` obsolete on DigiKey; LCSC has official + clone MPNs (sourcing inconsistency) |
+
+Two package-expansion options (accepting the small-leaded DRL/SOT-563 tier) were checked and ruled out: **onsemi NCP170** (500 nA, SOT-563, leaded) is only **150 mA** → too small for Wi-Fi bursts; **Toshiba TCR3UG33A** (<0.7 µA, 300 mA) is **WCSP** (leadless, not hand-solderable).
+
+#### Recommendation
+
+Both surviving candidates are from single-source vendors with lifecycle transparency (no clone ambiguity):
+
+* 🥇 **TLV75533PDBVR (TI)** — best all-round: 500 mA full headroom, lowest Iq (25 µA → +50% standby), and at ~$0.080 on LCSC it is **at price parity with the genuine AP2112K** (within the ≤20% budget). The one cost is that **pins 1 and 5 (OUT/IN) are swapped** vs the AP2112K, so it needs a footprint pin-map change + reroute of the `VIN`/`VOUT` nets — a minor, one-time layout edit worth doing during a revision.
+* 🥈 **MIC5504-3.3YM5-TR (Microchip)** — the true zero-layout-change drop-in (pin-for-pin identical; `EN`-to-`VIN` tie carries over), but 300 mA, less Iq gain (+23%), and ~+39% price (~$0.118, absolute delta ~3.5 ¢). Choose this if avoiding any layout change outranks the extra headroom/µA.
+
+**Caveats for both:** abs-max V_IN is **5.5 V** (vs the AP2112K's 6 V); worst-case `LDO_IN` (USB high, light load) is ~5.2 V — inside spec but with less margin, and hot-plug ringing leans on `CR1` to clamp. Verify the worst-case `LDO_IN` maximum before committing.
+
 This was a **schematic** review — connectivity, part selection, values, margins and datasheet conformance. Section 8 below adds placement/layout guidance, written at the point the schematic was essentially frozen and placement was beginning. It is guidance, **not** a review of an actual layout — no `.kicad_pcb` placement had been done when it was written.
 
 ---
