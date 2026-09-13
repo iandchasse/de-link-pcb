@@ -25,7 +25,7 @@ Successor to [de-link](https://de-link.me).
 > **Findings, open questions and proposed changes live in a separate document:
 > [`DESIGN_REVIEW.md`](../DESIGN_REVIEW.md).** This file describes the board *as it is*.
 >
-> Verified against `minRead_pcb.kicad_sch` / `minRead_pcb.pdf`, 2026-09-10.
+> Verified against `silkscreen_pcb.kicad_sch` / `silkscreen_pcb.pdf`, 2026-09-10.
 > 173 components, 126 nets, single A2 sheet.
 
 ---

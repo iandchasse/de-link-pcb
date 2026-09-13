@@ -1,6 +1,6 @@
 # de-link PCB — Schematic Review
 
-**Source of truth:** `minRead_pcb.kicad_sch` (KiCad 9.0.6, edited 2026-09-09) and `minRead_pcb.pdf` (printed 2026-09-09).
+**Source of truth:** `silkscreen_pcb.kicad_sch` (KiCad 9.0.6, edited 2026-09-09) and `silkscreen_pcb.pdf` (printed 2026-09-09).
 **Method:** netlist regenerated from the live schematic with `kicad-cli sch export netlist`, then every net and every device pin traced by hand; ERC run with `--severity-all`; all active-device pinouts checked against manufacturer datasheets.
 
 > Note: this file replaces an earlier review that described an *LM27313 / MCP73832 / AO3401 / 22 µH L2* design. Those parts are no longer on the board and that review was invalid.
@@ -484,8 +484,8 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 * `[simulation_model_issue]` ×3 — Q3/Q7/Q8 point at an `irlml6402` SPICE model in a non-existent library. Cosmetic (and note the **symbol is IRLML6402 while the value/BOM is AO3419** — the parts differ in Rds(on) and V_GS(th); make sure your simulations and your BOM agree).
 
 **Stale generated artefacts — regenerate before ordering:**
-* `minRead_pcb.net` is from **2026-08-21**; the schematic was edited **2026-09-09**.
-* `minRead_pcb.csv` (BOM) is from **2026-08-06** and is **materially wrong**: it lists `C9` as 4.7 µF (it is now 1 µF), `L1,L2` as both 22 µH SRN3010C (L2 is now 4.7 µH/1008), includes a `D7` that no longer exists, and has no entries for TPS923610 or DS3231MZ.
+* `silkscreen_pcb.net` is from **2026-08-21**; the schematic was edited **2026-09-09**.
+* `silkscreen_pcb.csv` (BOM) is from **2026-08-06** and is **materially wrong**: it lists `C9` as 4.7 µF (it is now 1 µF), `L1,L2` as both 22 µH SRN3010C (L2 is now 4.7 µH/1008), includes a `D7` that no longer exists, and has no entries for TPS923610 or DS3231MZ.
 * `production_files/` gerbers, BOM and CPL are from **2026-08-13**.
 
 **Verify before ordering:**
@@ -529,7 +529,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 
 ## 5. Change list — status
 
-*Verified against `minRead_pcb.kicad_sch` as of 2026-09-09 13:27. Values below were read back out of the file, not taken on trust.*
+*Verified against `silkscreen_pcb.kicad_sch` as of 2026-09-09 13:27. Values below were read back out of the file, not taken on trust.*
 
 ### ✅ Done — confirmed in the schematic
 

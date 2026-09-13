@@ -20888,7 +20888,7 @@
 			(uuid "9b435e42-b4b6-4d67-b0d1-9c0dd5494211")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR045")
 					(unit 1)
@@ -20954,7 +20954,7 @@
 			(uuid "3e481a73-666d-461f-bc82-f7b15f19eee4")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR026")
 					(unit 1)
@@ -21021,7 +21021,7 @@
 			(uuid "b6e1549b-b8a9-4d86-b185-33db2096616f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R53")
 					(unit 1)
@@ -21090,7 +21090,7 @@
 			(uuid "9442fbac-2d02-44ac-a623-fc7e75ba3c9a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R2")
 					(unit 1)
@@ -21157,7 +21157,7 @@
 			(uuid "ae772a47-8907-4da4-88a5-7c358b602b00")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R19")
 					(unit 1)
@@ -21227,7 +21227,7 @@
 			(uuid "58944dfc-8eaf-4015-a6a0-e177e9b0897c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C31")
 					(unit 1)
@@ -21293,7 +21293,7 @@
 			(uuid "370dc476-0cd0-45d6-84ba-840fc5932d7a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR053")
 					(unit 1)
@@ -21362,7 +21362,7 @@
 			(uuid "89695ed6-9e4d-41e1-b3d0-6c9c3fd6c68b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C3")
 					(unit 1)
@@ -21432,7 +21432,7 @@
 			(uuid "6a567d02-23de-4329-bb7d-c20d73256a0b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "J5")
 					(unit 1)
@@ -21498,7 +21498,7 @@
 			(uuid "c18446c3-3e9a-475e-a21a-cd91a9eedd5e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR035")
 					(unit 1)
@@ -21566,7 +21566,7 @@
 			(uuid "32849a59-c3c9-403d-b0be-52f6648f2d0a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R62")
 					(unit 1)
@@ -21633,7 +21633,7 @@
 			(uuid "af6249df-4ac8-4b78-8867-b26dbb4c4e00")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R59")
 					(unit 1)
@@ -21700,7 +21700,7 @@
 			(uuid "29e55b01-3f68-411c-875a-9d4f182a9549")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR047")
 					(unit 1)
@@ -21717,7 +21717,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "0d77ccce-7760-46ca-80c1-339db5d56153")
-		(property "Reference" "U14"
+		(property "Reference" "U3"
 			(at 196.85 30.988 0)
 			(effects
 				(font
@@ -21779,7 +21779,7 @@
 		(instances
 			(project ""
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
-					(reference "U14")
+					(reference "U3")
 					(unit 1)
 				)
 			)
@@ -21844,7 +21844,7 @@
 			(uuid "fa9b2c47-2e3e-4851-8edf-97d0932425b6")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R67")
 					(unit 1)
@@ -21910,7 +21910,7 @@
 			(uuid "5f2cdb01-2aa8-4bba-931b-dea22336c5d0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR01")
 					(unit 1)
@@ -22061,7 +22061,7 @@
 			(uuid "4d38385c-2d79-4406-b273-2ab6cbe0a024")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "J2")
 					(unit 1)
@@ -22126,7 +22126,7 @@
 			(uuid "a44ef43b-e32a-4bb1-8e48-9d4884f808a4")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR071")
 					(unit 1)
@@ -22192,7 +22192,7 @@
 			(uuid "81d5d185-b90a-4336-98ca-c4ca2ff3ed4f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR062")
 					(unit 1)
@@ -22259,7 +22259,7 @@
 			(uuid "93e707bc-1591-43ed-a761-7131bfcfe499")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R21")
 					(unit 1)
@@ -22328,7 +22328,7 @@
 			(uuid "10bf730a-e2c2-4656-b692-8db8d24e7504")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C7")
 					(unit 1)
@@ -22395,7 +22395,7 @@
 			(uuid "6c2d808b-a3fd-4954-b63d-06a04ecdfbd9")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R42")
 					(unit 1)
@@ -22462,7 +22462,7 @@
 			(uuid "8da3cd95-e123-47b4-beac-95c3ba2b767d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R23")
 					(unit 1)
@@ -22529,7 +22529,7 @@
 			(uuid "5c54466b-7459-4189-b162-9f99dc401f76")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C37")
 					(unit 1)
@@ -22599,7 +22599,7 @@
 			(uuid "476195a3-08d0-466f-a3e6-295fadcfc6a8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R38")
 					(unit 1)
@@ -22666,7 +22666,7 @@
 			(uuid "a6b55103-e8e1-438a-a8d7-4e5df1248656")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "TP4")
 					(unit 1)
@@ -22732,7 +22732,7 @@
 			(uuid "2ef2f8be-d221-4b46-a95c-13b86999fa33")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR072")
 					(unit 1)
@@ -22802,7 +22802,7 @@
 			(uuid "29682b2f-87f1-485e-8ac5-abd74e370488")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C25")
 					(unit 1)
@@ -22870,7 +22870,7 @@
 			(uuid "fad929c3-2732-4f12-b080-340a5b506c3b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW11")
 					(unit 1)
@@ -23003,7 +23003,7 @@
 			(uuid "9267ba46-a8a6-4fb2-b07c-6b768741cd02")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR074")
 					(unit 1)
@@ -23070,7 +23070,7 @@
 			(uuid "c9d67b84-5099-46cd-b601-184de163d1da")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR060")
 					(unit 1)
@@ -23140,7 +23140,7 @@
 			(uuid "5159b4c0-7fcd-40e6-8032-47e762abef1b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C2")
 					(unit 1)
@@ -23210,7 +23210,7 @@
 			(uuid "ba5ed438-7ae9-4738-82db-bf61509f2263")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C8")
 					(unit 1)
@@ -23279,7 +23279,7 @@
 			(uuid "73a2bd9a-64d5-4e7a-b851-37de5ec5e89f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C12")
 					(unit 1)
@@ -23346,7 +23346,7 @@
 			(uuid "5c198fc2-d907-4681-9b14-4d12ce0d5afe")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R17")
 					(unit 1)
@@ -23413,7 +23413,7 @@
 			(uuid "1a782d4e-1d1a-42fd-8b8e-526c2c87e963")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR070")
 					(unit 1)
@@ -23603,7 +23603,7 @@
 			(uuid "ada6a00b-e6f0-4230-9810-78b106784a35")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "U9")
 					(unit 1)
@@ -23673,7 +23673,7 @@
 			(uuid "5109d83a-3bf5-4f09-8a77-557e21325b91")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R16")
 					(unit 1)
@@ -23740,7 +23740,7 @@
 			(uuid "9e029ee8-7dfa-4b3b-991d-81e758c8f50b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R54")
 					(unit 1)
@@ -23807,7 +23807,7 @@
 			(uuid "dde9342f-549e-4f73-8e7e-29b8faa2b74b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R65")
 					(unit 1)
@@ -23877,7 +23877,7 @@
 			(uuid "38dd6e98-05b8-4204-b8c9-9a9ab751c1aa")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R50")
 					(unit 1)
@@ -23944,7 +23944,7 @@
 			(uuid "d2a2a706-d300-41f5-9620-a65376ff9314")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R66")
 					(unit 1)
@@ -24134,7 +24134,7 @@
 			(uuid "1ff1c593-7183-4081-aba8-956e67d48c4a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "U7")
 					(unit 1)
@@ -24204,7 +24204,7 @@
 			(uuid "1f18df9a-374a-4ea8-905f-aedf896902ef")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW2")
 					(unit 1)
@@ -24270,7 +24270,7 @@
 			(uuid "855a8103-118a-4355-9a8c-67f4062d1ea2")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR029")
 					(unit 1)
@@ -24336,7 +24336,7 @@
 			(uuid "0d7323ba-f46d-49c3-a0ad-89da54c9cc8d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR023")
 					(unit 1)
@@ -24403,7 +24403,7 @@
 			(uuid "c7b69e8e-161c-47ee-af2b-6fe769942387")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R37")
 					(unit 1)
@@ -24469,7 +24469,7 @@
 			(uuid "509ce809-795e-4497-9705-0deaa24f1d83")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR024")
 					(unit 1)
@@ -24535,7 +24535,7 @@
 			(uuid "b895a2a4-601e-4f4c-a37e-8289509ed8ad")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR056")
 					(unit 1)
@@ -24605,7 +24605,7 @@
 			(uuid "909b821d-2f1a-47f9-9249-530473deb796")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R77")
 					(unit 1)
@@ -24672,7 +24672,7 @@
 			(uuid "76fbfa71-518a-4fc7-a5c1-c94d572d7a98")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "H5")
 					(unit 1)
@@ -24739,7 +24739,7 @@
 			(uuid "012f8da8-3ab1-41cf-b9b2-edf7478b676d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "H2")
 					(unit 1)
@@ -24809,7 +24809,7 @@
 			(uuid "10636c53-7da2-4527-9a31-8dab996d3520")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C10")
 					(unit 1)
@@ -24876,7 +24876,7 @@
 			(uuid "35691d5d-d244-4814-aad4-f0110e57008a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R45")
 					(unit 1)
@@ -24946,7 +24946,7 @@
 			(uuid "17a4da84-23b2-4d8e-9b3b-8f341116db2e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C26")
 					(unit 1)
@@ -25013,7 +25013,7 @@
 			(uuid "288b2d5b-66ec-410c-ade3-0c67d2967e50")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R69")
 					(unit 1)
@@ -25079,7 +25079,7 @@
 			(uuid "6b9145f1-c8bf-4bf1-94c6-ec65e201602e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR012")
 					(unit 1)
@@ -25146,7 +25146,7 @@
 			(uuid "ac6ec706-7875-4b48-8870-1d749bf0d0ce")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#FLG03")
 					(unit 1)
@@ -25213,7 +25213,7 @@
 			(uuid "f95ff294-95f5-4d70-ac9a-7fa55d9be760")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R29")
 					(unit 1)
@@ -25280,7 +25280,7 @@
 			(uuid "fb4f6489-27f1-4a7f-8c69-33dbc3bc94fb")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "TP2")
 					(unit 1)
@@ -25387,7 +25387,7 @@
 			(uuid "229e5206-055b-4ee0-9618-764c991ec356")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "J1")
 					(unit 1)
@@ -25457,7 +25457,7 @@
 			(uuid "42a5362d-14da-480e-84d1-9f4681e8ed97")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R13")
 					(unit 1)
@@ -25523,7 +25523,7 @@
 			(uuid "e1ccaa88-7878-4191-836c-42166cee4124")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR015")
 					(unit 1)
@@ -25590,7 +25590,7 @@
 			(uuid "162a627d-a079-4220-b2c4-54892569b035")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R35")
 					(unit 1)
@@ -25657,7 +25657,7 @@
 			(uuid "7c7abda2-5d07-4dd9-a7ae-44a31f6277ef")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C36")
 					(unit 1)
@@ -25723,7 +25723,7 @@
 			(uuid "83b4f1a2-e5da-42b9-9d52-367316685058")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR09")
 					(unit 1)
@@ -25790,7 +25790,7 @@
 			(uuid "4652a18b-cb94-4410-b10d-a9bac5e5ff6e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R33")
 					(unit 1)
@@ -25857,7 +25857,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C13")
 					(unit 1)
@@ -25923,7 +25923,7 @@
 			(uuid "0971ab1e-10be-41c9-bc66-a02f4ca73499")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR065")
 					(unit 1)
@@ -25990,7 +25990,7 @@
 			(uuid "82254090-3fa2-4a18-9e62-9d9100a9c46f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R22")
 					(unit 1)
@@ -26060,7 +26060,7 @@
 			(uuid "3c933406-098e-482b-85e0-7bfc6d66b02c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C33")
 					(unit 1)
@@ -26130,7 +26130,7 @@
 			(uuid "076ff506-2893-4382-be1c-f920c64b20bb")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW1")
 					(unit 1)
@@ -26196,7 +26196,7 @@
 			(uuid "1692404f-79c0-4c48-a5e7-4b5593ff3015")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR079")
 					(unit 1)
@@ -26263,7 +26263,7 @@
 			(uuid "8133bbee-82fa-4789-af0f-a5aa41b6f644")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR044")
 					(unit 1)
@@ -26331,7 +26331,7 @@
 			(uuid "94cfc192-6f94-496b-9294-922d111114c0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R63")
 					(unit 1)
@@ -26400,7 +26400,7 @@
 			(uuid "13c79a3d-00f8-423c-9129-189f3bb1a0d2")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C9")
 					(unit 1)
@@ -26470,7 +26470,7 @@
 			(uuid "7951e20b-2846-4190-b50d-7b95ca235443")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R14")
 					(unit 1)
@@ -26536,7 +26536,7 @@
 			(uuid "0adb6114-3cf2-4b27-b987-e80c1c7643b5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR028")
 					(unit 1)
@@ -26612,7 +26612,7 @@
 			(uuid "c535f49f-ed75-4044-a670-463269227266")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "Q5")
 					(unit 1)
@@ -26679,7 +26679,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C18")
 					(unit 1)
@@ -26746,7 +26746,7 @@
 			(uuid "c7f27059-0914-4559-b390-61e80f8b85d8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "H3")
 					(unit 1)
@@ -26884,7 +26884,7 @@
 			(uuid "34ebad46-4c8f-49cd-a8e0-02f3902bd772")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C23")
 					(unit 1)
@@ -26950,7 +26950,7 @@
 			(uuid "77bc8b26-0df5-43f1-a26f-7b50d64fd2bc")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR039")
 					(unit 1)
@@ -27016,7 +27016,7 @@
 			(uuid "81878cba-dde5-47dc-96bb-f9fe237a232e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR034")
 					(unit 1)
@@ -27086,7 +27086,7 @@
 			(uuid "53b0b588-e9e0-4c10-9d56-802afcf203be")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R7")
 					(unit 1)
@@ -27154,7 +27154,7 @@
 			(uuid "d0c05cf5-08b5-4dbb-a6c1-1bb20c0208a6")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "L1")
 					(unit 1)
@@ -27295,7 +27295,7 @@
 			(uuid "54ec5b17-0042-4c6a-8908-0ec49218e4c0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "CR2")
 					(unit 1)
@@ -27362,7 +27362,7 @@
 			(uuid "ccd53329-3d00-4685-b7f2-4ea278727e66")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R52")
 					(unit 1)
@@ -27428,7 +27428,7 @@
 			(uuid "98f7d871-ddb5-4b1b-9038-a07afbf2a558")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#FLG01")
 					(unit 1)
@@ -27495,7 +27495,7 @@
 			(uuid "a51d44ab-a949-4f97-8c2d-e220fdf8ccaa")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR018")
 					(unit 1)
@@ -27626,7 +27626,7 @@
 			(uuid "85f36897-a47a-4a86-9cbe-ef1bad9c4b15")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR066")
 					(unit 1)
@@ -27715,7 +27715,7 @@
 			(uuid "46db1008-e239-4e7e-b756-b257f040adac")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "J7")
 					(unit 1)
@@ -27781,7 +27781,7 @@
 			(uuid "142ae7b1-8773-4342-a82e-9a3ecda6d0f5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR07")
 					(unit 1)
@@ -27847,7 +27847,7 @@
 			(uuid "ed83ae9c-d00f-418e-9c6e-1a213c3b6434")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR064")
 					(unit 1)
@@ -27914,7 +27914,7 @@
 			(uuid "dbce6a84-8caf-49a4-881b-f7c493ee49d5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R58")
 					(unit 1)
@@ -27981,7 +27981,7 @@
 			(uuid "de21ec6e-fd41-469e-89ee-74fce3ecddad")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R70")
 					(unit 1)
@@ -28046,7 +28046,7 @@
 			(uuid "453cdd1c-7df2-4b56-ad6c-745b60f4ac0d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR069")
 					(unit 1)
@@ -28112,7 +28112,7 @@
 			(uuid "7e75d50c-7e21-40cd-8341-ad2455124ce1")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR068")
 					(unit 1)
@@ -28178,7 +28178,7 @@
 			(uuid "f94f1011-94a8-4df1-a4cd-53e287abc33b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR067")
 					(unit 1)
@@ -28346,7 +28346,7 @@
 			(uuid "1b648a7b-e941-46b3-abf5-0c7990878d2e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "J4")
 					(unit 1)
@@ -28413,7 +28413,7 @@
 			(uuid "ef4c5634-04d1-4785-bcd1-36a25b92b000")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR02")
 					(unit 1)
@@ -28581,7 +28581,7 @@
 			(uuid "11763032-7e7b-4ca0-ba91-a6cbc594fa2e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR030")
 					(unit 1)
@@ -28647,7 +28647,7 @@
 			(uuid "b07a3801-9ec1-424d-93db-9f100fc08d92")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR041")
 					(unit 1)
@@ -28714,7 +28714,7 @@
 			(uuid "3b0e47e5-b1e8-4cef-8c39-0c7437040de2")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C1")
 					(unit 1)
@@ -28781,7 +28781,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C16")
 					(unit 1)
@@ -28848,7 +28848,7 @@
 			(uuid "023d259f-6e76-4443-a1bf-5199d605ad30")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R26")
 					(unit 1)
@@ -28915,7 +28915,7 @@
 			(uuid "de02f8d5-1fc8-4054-9a37-3ca18fb5d44e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R24")
 					(unit 1)
@@ -28982,7 +28982,7 @@
 			(uuid "ae7d1293-8504-46de-9eff-a45912fe97df")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R56")
 					(unit 1)
@@ -29052,7 +29052,7 @@
 			(uuid "f60d9e4d-7c4f-42ce-b543-5c2f9b052354")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R76")
 					(unit 1)
@@ -29120,7 +29120,7 @@
 			(uuid "95981657-26ca-4aa3-ab78-1df520107e48")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R72")
 					(unit 1)
@@ -29273,7 +29273,7 @@
 			(uuid "fdac8ac8-0d61-4a73-aff0-06537e2973ea")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R71")
 					(unit 1)
@@ -29343,7 +29343,7 @@
 			(uuid "80d0805c-87bc-42ee-af36-28db9b41f93b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R5")
 					(unit 1)
@@ -29491,7 +29491,7 @@
 			(uuid "d28e669a-a7f5-446b-b3fb-5ee1320023ac")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "D5")
 					(unit 1)
@@ -29560,7 +29560,7 @@
 			(uuid "d60a69ca-84ba-4f04-95e9-f22ae1044ceb")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R6")
 					(unit 1)
@@ -29627,7 +29627,7 @@
 			(uuid "fa1323b0-4a73-4d37-894e-218189af31a7")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R28")
 					(unit 1)
@@ -29694,7 +29694,7 @@
 			(uuid "fa5e72ea-79e0-4808-b199-e7e1dda8f41b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C22")
 					(unit 1)
@@ -29805,7 +29805,7 @@
 			(uuid "d51cdcbd-2a49-4928-b354-096c8dafb838")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "Q7")
 					(unit 1)
@@ -29875,7 +29875,7 @@
 			(uuid "2004c806-9537-4e27-9d8c-863ea4ef26af")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW5")
 					(unit 1)
@@ -29986,7 +29986,7 @@
 			(uuid "5cecd838-c286-423c-8762-3a92adcd2045")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "Q3")
 					(unit 1)
@@ -30053,7 +30053,7 @@
 			(uuid "3a399be4-68da-42cc-9bf4-0c59cc58b08f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R25")
 					(unit 1)
@@ -30120,7 +30120,7 @@
 			(uuid "cef42c55-e1a7-4855-bf14-5379e6c1d35b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R46")
 					(unit 1)
@@ -30187,7 +30187,7 @@
 			(uuid "fc536e6c-09c3-4d03-8a56-7da7ce7248ac")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C28")
 					(unit 1)
@@ -30257,7 +30257,7 @@
 			(uuid "0bdd9b73-9153-4b67-8086-c55dbbfc215f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R47")
 					(unit 1)
@@ -30323,7 +30323,7 @@
 			(uuid "c54a7097-eb2d-40b6-ae54-f35045d10c8f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR022")
 					(unit 1)
@@ -30390,7 +30390,7 @@
 			(uuid "404abc81-7862-452c-980d-042e7d6139ae")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR055")
 					(unit 1)
@@ -30457,7 +30457,7 @@
 			(uuid "d4e929ad-017b-4217-a075-e4a51a4795a5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR077")
 					(unit 1)
@@ -30523,7 +30523,7 @@
 			(uuid "81151d4d-2ab3-4afa-889b-d2003f7ae84b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR063")
 					(unit 1)
@@ -30590,7 +30590,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C14")
 					(unit 1)
@@ -30802,7 +30802,7 @@
 			(uuid "998c6e75-4e80-483f-9b3c-64f6f07c4dd0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C30")
 					(unit 1)
@@ -30869,7 +30869,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C15")
 					(unit 1)
@@ -30935,7 +30935,7 @@
 			(uuid "37e8231e-2801-4094-81a4-d83713ea87ad")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR038")
 					(unit 1)
@@ -31092,7 +31092,7 @@
 			(uuid "a3223050-0359-43ee-b61e-97895188ea72")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR043")
 					(unit 1)
@@ -31159,7 +31159,7 @@
 			(uuid "78e07b99-5e97-427a-8ef6-465cc6565e24")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R20")
 					(unit 1)
@@ -31317,7 +31317,7 @@
 			(uuid "100218e2-2970-4246-9a56-3f063a4ffc17")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "Q4")
 					(unit 1)
@@ -31473,7 +31473,7 @@
 			(uuid "f398c091-f535-4f07-8509-f2963b72b6f3")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "L2")
 					(unit 1)
@@ -31543,7 +31543,7 @@
 			(uuid "08027bf2-3dd1-43d4-97f3-50d2e0fe9e95")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C4")
 					(unit 1)
@@ -31613,7 +31613,7 @@
 			(uuid "d28e669a-a7f5-446b-b3fb-5ee1320023ad")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "D4")
 					(unit 1)
@@ -31679,7 +31679,7 @@
 			(uuid "c5efd038-904f-4998-b258-049d272d1d88")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR073")
 					(unit 1)
@@ -31816,7 +31816,7 @@
 			(uuid "76ecee63-f778-459e-9691-fa27616f8655")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R51")
 					(unit 1)
@@ -31886,7 +31886,7 @@
 			(uuid "eae6a971-2a4d-45a7-a5f5-87af70de942c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C32")
 					(unit 1)
@@ -31998,7 +31998,7 @@
 			(uuid "d79d1687-1258-4f90-bdaa-066720f012e1")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "Q8")
 					(unit 1)
@@ -32065,7 +32065,7 @@
 			(uuid "a7faa0a6-e8c5-4b15-b1aa-583027598ea8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R11")
 					(unit 1)
@@ -32132,7 +32132,7 @@
 			(uuid "7cc3a44b-2ec8-40f8-bfe0-5054668423f7")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R32")
 					(unit 1)
@@ -32199,7 +32199,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa8f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C20")
 					(unit 1)
@@ -32265,7 +32265,7 @@
 			(uuid "096f1cba-24d9-481a-8c72-7a55d184e2e5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR033")
 					(unit 1)
@@ -32335,7 +32335,7 @@
 			(uuid "f8cbf24f-a94b-48a4-90d5-853fe1058514")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C6")
 					(unit 1)
@@ -32405,7 +32405,7 @@
 			(uuid "aa03b5e1-0e52-4fbe-9fe2-be459f2bcd7f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R78")
 					(unit 1)
@@ -32471,7 +32471,7 @@
 			(uuid "333d24e3-33a1-4462-a665-35af84ce5b78")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR046")
 					(unit 1)
@@ -32541,7 +32541,7 @@
 			(uuid "d723a63e-d1a8-4b5d-b77d-93803c870c28")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R39")
 					(unit 1)
@@ -32608,7 +32608,7 @@
 			(uuid "0e9ed875-6e43-4cc2-bf29-5cfe6167e7fd")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R61")
 					(unit 1)
@@ -32674,7 +32674,7 @@
 			(uuid "08ce1017-6a49-4258-b57f-cde606cb6808")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR019")
 					(unit 1)
@@ -32741,7 +32741,7 @@
 			(uuid "f9d6a9f4-95bf-4c5b-b6f8-b516ffdaf2fd")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR051")
 					(unit 1)
@@ -32807,7 +32807,7 @@
 			(uuid "8d260685-71bf-4e07-822f-8d999149f117")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR075")
 					(unit 1)
@@ -32873,7 +32873,7 @@
 			(uuid "1918c815-294c-47b6-9c92-e130e15ff0fd")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR037")
 					(unit 1)
@@ -32940,7 +32940,7 @@
 			(uuid "0d8395dd-ad37-4cf3-89fc-27612a137f25")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R8")
 					(unit 1)
@@ -33007,7 +33007,7 @@
 			(uuid "20b40fe9-57b6-4cc3-9f59-7d085801c66c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R57")
 					(unit 1)
@@ -33077,7 +33077,7 @@
 			(uuid "5755dea5-7746-4c52-b80b-be03afb5af45")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW4")
 					(unit 1)
@@ -33144,7 +33144,7 @@
 			(uuid "ed562ce2-b875-49cc-a3b0-3d7d2357510f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C27")
 					(unit 1)
@@ -33211,7 +33211,7 @@
 			(uuid "ebb84bca-cbdf-4a8e-b5f7-60229029e0af")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R55")
 					(unit 1)
@@ -33344,7 +33344,7 @@
 			(uuid "c9fd8766-7e78-4c59-acaf-ce6613828c20")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R34")
 					(unit 1)
@@ -33410,7 +33410,7 @@
 			(uuid "2d22ce2b-1eb7-4beb-875f-8113e1ad188f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR06")
 					(unit 1)
@@ -33476,7 +33476,7 @@
 			(uuid "f1013bcf-2a05-4dd1-a60d-b2bca75fa2cd")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR017")
 					(unit 1)
@@ -33543,7 +33543,7 @@
 			(uuid "d22160fd-5d33-4b05-9c3b-9d80b89b2674")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R68")
 					(unit 1)
@@ -33613,7 +33613,7 @@
 			(uuid "962643d6-d2d0-45d7-8452-cc858e23bb2b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R48")
 					(unit 1)
@@ -33680,7 +33680,7 @@
 			(uuid "5e17e25d-625f-49f4-80ee-1bb8faa28f1a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R4")
 					(unit 1)
@@ -33750,7 +33750,7 @@
 			(uuid "3dc634bb-b942-4f22-aa1e-ec8fb9354b22")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R49")
 					(unit 1)
@@ -33987,7 +33987,7 @@
 			(uuid "8b47a548-f7d0-481e-b82f-934a239cff8a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW3")
 					(unit 1)
@@ -34249,7 +34249,7 @@
 			(uuid "08048fed-b710-4cdf-ad85-caaca5f4d922")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "U4")
 					(unit 1)
@@ -34506,7 +34506,7 @@
 			(uuid "b9f2779d-9783-406d-8557-4e81c26a25eb")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "H4")
 					(unit 1)
@@ -34573,7 +34573,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa90")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C19")
 					(unit 1)
@@ -34640,7 +34640,7 @@
 			(uuid "9d350dba-647f-4a54-bd6f-dabb74a1c426")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C24")
 					(unit 1)
@@ -34830,7 +34830,7 @@
 			(uuid "1c214f38-e164-4015-b101-3ea20c55b394")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "U8")
 					(unit 1)
@@ -34896,7 +34896,7 @@
 			(uuid "27455ced-827f-4210-b535-2eab819adb3d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR057")
 					(unit 1)
@@ -34966,7 +34966,7 @@
 			(uuid "6a1798c2-1c82-4f92-959d-2a812045ed6a")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW8")
 					(unit 1)
@@ -35032,7 +35032,7 @@
 			(uuid "4a621beb-c60d-4b8b-8730-ee755b818816")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR048")
 					(unit 1)
@@ -35099,7 +35099,7 @@
 			(uuid "012e0780-3bb1-424e-890b-f1390653ad57")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R36")
 					(unit 1)
@@ -35166,7 +35166,7 @@
 			(uuid "b2d8422d-eb85-4cd4-975d-e35efdbd4850")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR052")
 					(unit 1)
@@ -35233,7 +35233,7 @@
 			(uuid "86b2b54d-e3da-422e-916e-412b9c5be706")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR03")
 					(unit 1)
@@ -35299,7 +35299,7 @@
 			(uuid "dc2717a5-95ff-4acb-a266-c59f7a1ac7f8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR042")
 					(unit 1)
@@ -35367,7 +35367,7 @@
 			(uuid "191d4545-f004-4751-90fb-381e75c3838c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R40")
 					(unit 1)
@@ -35436,7 +35436,7 @@
 			(uuid "b969a144-8895-43c1-b9e5-c7f4d0483558")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R75")
 					(unit 1)
@@ -35506,7 +35506,7 @@
 			(uuid "de27a6d8-390e-4f88-a169-cbc33d0eb54f")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C29")
 					(unit 1)
@@ -35573,7 +35573,7 @@
 			(uuid "9c8b1335-3aed-4d93-8abe-8b391e71336c")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R44")
 					(unit 1)
@@ -35763,7 +35763,7 @@
 			(uuid "d9556ca3-8d2a-41ed-b07a-58aa4382452b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "U6")
 					(unit 1)
@@ -35829,7 +35829,7 @@
 			(uuid "45e3fb76-69f2-4ffa-b83c-e85ff020e993")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR049")
 					(unit 1)
@@ -35899,7 +35899,7 @@
 			(uuid "96ca1ab8-898d-46ae-8d16-6d6d198156a9")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R41")
 					(unit 1)
@@ -35965,7 +35965,7 @@
 			(uuid "51c56e74-6ea3-4a1c-8703-b0413fbb2ad5")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR050")
 					(unit 1)
@@ -36031,7 +36031,7 @@
 			(uuid "aee954bd-fc84-4e12-822b-28a4c6f9cb6e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR036")
 					(unit 1)
@@ -36098,7 +36098,7 @@
 			(uuid "44ca71c4-1323-49ab-b3d4-ae75c21cfa91")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C17")
 					(unit 1)
@@ -36168,7 +36168,7 @@
 			(uuid "7c9b26f5-960e-4e26-ae71-d2d3c18a962b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "CR3")
 					(unit 1)
@@ -36235,7 +36235,7 @@
 			(uuid "2b3092df-575d-4f53-8a22-5ff4fd128321")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "TP5")
 					(unit 1)
@@ -36302,7 +36302,7 @@
 			(uuid "4a07254b-2268-4c6e-a8a1-44b53aae5d59")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R74")
 					(unit 1)
@@ -36369,7 +36369,7 @@
 			(uuid "764b06bf-cec8-458e-903e-32be29c0db73")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR040")
 					(unit 1)
@@ -36435,7 +36435,7 @@
 			(uuid "dd7ee408-9dcd-4062-9fa6-6a2c589eb4df")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR021")
 					(unit 1)
@@ -36505,7 +36505,7 @@
 			(uuid "481d7e6e-2e63-4fe5-bd26-b1263b488d96")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW9")
 					(unit 1)
@@ -36572,7 +36572,7 @@
 			(uuid "36de4b34-581b-4dad-8fd3-b9b5bde9c6e3")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R1")
 					(unit 1)
@@ -36639,7 +36639,7 @@
 			(uuid "5c9f686a-8f89-4d93-aeba-d7e3372eb70d")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR061")
 					(unit 1)
@@ -36705,7 +36705,7 @@
 			(uuid "1fcfacc2-727f-4d1a-8b2d-e6afabd12ec7")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR08")
 					(unit 1)
@@ -36771,7 +36771,7 @@
 			(uuid "b978255a-e6e6-483e-a4e4-39f80f0d73d7")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#FLG02")
 					(unit 1)
@@ -36837,7 +36837,7 @@
 			(uuid "86686ed0-398f-4c0d-8b85-4ab67ae08105")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR010")
 					(unit 1)
@@ -36904,7 +36904,7 @@
 			(uuid "3b849704-3abe-4af8-baa3-4022a4bf0cd2")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R18")
 					(unit 1)
@@ -36972,7 +36972,7 @@
 			(uuid "a750ce6b-3afb-4bbf-a732-62003f000546")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R64")
 					(unit 1)
@@ -37039,7 +37039,7 @@
 			(uuid "3467f8c7-c067-422a-aa3a-64ff728e7f38")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR054")
 					(unit 1)
@@ -37105,7 +37105,7 @@
 			(uuid "4162a1c7-d492-4345-ab1b-840c8064c357")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR027")
 					(unit 1)
@@ -37172,7 +37172,7 @@
 			(uuid "2c2ee308-6c25-427d-a768-31a593eb17ab")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R27")
 					(unit 1)
@@ -37321,7 +37321,7 @@
 			(uuid "75b2d2ac-9c6f-44d2-8cb9-837643331844")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR013")
 					(unit 1)
@@ -37387,7 +37387,7 @@
 			(uuid "e9deb86d-f613-46b8-8429-feaf7fab53b6")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR016")
 					(unit 1)
@@ -37456,7 +37456,7 @@
 			(uuid "fa0c5d94-3baf-4d3e-a3a9-5a7faa83e9be")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R3")
 					(unit 1)
@@ -37523,7 +37523,7 @@
 			(uuid "a0d71cf6-af82-4934-af0e-7cabbb79e6b1")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR05")
 					(unit 1)
@@ -37591,7 +37591,7 @@
 			(uuid "7951e20b-2846-4190-b50d-7b95ca235447")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R15")
 					(unit 1)
@@ -37657,7 +37657,7 @@
 			(uuid "5fe1bb61-33a6-4fad-9e5d-2420e7290457")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR058")
 					(unit 1)
@@ -37722,7 +37722,7 @@
 			(uuid "4c12f60b-d20e-47e6-8520-f4dad5a2cc32")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR011")
 					(unit 1)
@@ -37792,7 +37792,7 @@
 			(uuid "4980e8bf-a9b9-459c-8fea-7ee61c7e6795")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R12")
 					(unit 1)
@@ -37859,7 +37859,7 @@
 			(uuid "f8c452f4-47ee-4e79-b4d5-704a0a42b9db")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R60")
 					(unit 1)
@@ -37926,7 +37926,7 @@
 			(uuid "2c002702-93da-4a91-9555-926231ceb3e8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR078")
 					(unit 1)
@@ -37993,7 +37993,7 @@
 			(uuid "b5fa437c-61c1-4984-82c8-41da9500a776")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R73")
 					(unit 1)
@@ -38059,7 +38059,7 @@
 			(uuid "c4ad4e7a-94ed-490c-b66f-e0815c297494")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR014")
 					(unit 1)
@@ -38129,7 +38129,7 @@
 			(uuid "6fe0077e-4343-4048-be66-c27544a38c01")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R10")
 					(unit 1)
@@ -38196,7 +38196,7 @@
 			(uuid "82ebf1c3-6203-46a0-98ee-8f30f8f9efd0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R31")
 					(unit 1)
@@ -38333,7 +38333,7 @@
 			(uuid "e9b3dc8d-e3a8-4079-bac5-58a33fd0c804")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW7")
 					(unit 1)
@@ -38400,7 +38400,7 @@
 			(uuid "c2b76d95-1a3e-4e7b-b584-c270c3c2dae8")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R43")
 					(unit 1)
@@ -38539,7 +38539,7 @@
 			(uuid "a1fc73d7-7d07-444d-bb1b-998990125395")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "CR1")
 					(unit 1)
@@ -38605,7 +38605,7 @@
 			(uuid "7c2d17af-3311-47ad-87e8-ec15599d20ff")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR032")
 					(unit 1)
@@ -38674,7 +38674,7 @@
 			(uuid "85631055-9f5f-45cc-b7c6-c303fdcbe69e")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C5")
 					(unit 1)
@@ -38740,7 +38740,7 @@
 			(uuid "8e777262-29c1-47c1-adfe-260ec6c4cac0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR020")
 					(unit 1)
@@ -38807,7 +38807,7 @@
 			(uuid "b706b0aa-6f3c-41d5-8e0a-381d949fd526")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "H1")
 					(unit 1)
@@ -38877,7 +38877,7 @@
 			(uuid "d28e669a-a7f5-446b-b3fb-5ee1320023ae")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "D6")
 					(unit 1)
@@ -38944,7 +38944,7 @@
 			(uuid "b59ca815-c947-46dc-b3ae-65c8b3600f34")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR076")
 					(unit 1)
@@ -39012,7 +39012,7 @@
 			(uuid "10636c53-7da2-4527-9a31-8dab996d3521")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C11")
 					(unit 1)
@@ -39080,7 +39080,7 @@
 			(uuid "d5606575-f66d-4b02-bfc0-202f055cbbe3")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW10")
 					(unit 1)
@@ -39149,7 +39149,7 @@
 			(uuid "ece09f9e-8a6b-45b6-ba76-811b11df84ce")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "C21")
 					(unit 1)
@@ -39296,7 +39296,7 @@
 			(uuid "08fc3c05-dc9a-4634-af13-89da1c245f02")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "#PWR059")
 					(unit 1)
@@ -39364,7 +39364,7 @@
 			(uuid "5a50bb55-efa7-4d8b-89d0-62aa8eb62bd9")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "SW6")
 					(unit 1)
@@ -39431,7 +39431,7 @@
 			(uuid "99cf65ff-a3f1-4400-b5b9-a7988f9909c0")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R30")
 					(unit 1)
@@ -39498,7 +39498,7 @@
 			(uuid "9ebfb843-77cc-4d6f-86c9-dcd8441ed65b")
 		)
 		(instances
-			(project "minRead_pcb"
+			(project "silkscreen_pcb"
 				(path "/2fbd4c8f-b784-4d80-b374-4947df99a9bf"
 					(reference "R9")
 					(unit 1)

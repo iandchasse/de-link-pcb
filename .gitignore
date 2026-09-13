@@ -1,5 +1,6 @@
 EPD_Hub_ESP32-backups
 minRead_pcb-backups
+silkscreen_pcb-backups
 /ordering script
 
 # LTspice raw simulation output (can be huge)
@@ -14,3 +15,9 @@ _autosave-*
 ~*.lck
 \#auto_saved_files\#
 *.bak
+*-bak
+
+# Generated fabrication output — regenerate with kicad-cli (see fabrication/README.md).
+# BOM, assembly CSVs and the how-to ARE tracked; the gerber/drill artifacts are not.
+fabrication/gerbers/
+fabrication/*.zip

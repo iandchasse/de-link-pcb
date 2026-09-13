@@ -694,7 +694,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "minRead_pcb.kicad_pro",
+    "filename": "silkscreen_pcb.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -805,7 +805,7 @@
   "pcbnew": {
     "last_paths": {
       "gencad": "",
-      "idf": "minRead_pcb.emn",
+      "idf": "silkscreen_pcb.emn",
       "netlist": "",
       "plot": "gerbers/",
       "pos_files": "placement/",
