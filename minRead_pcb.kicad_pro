@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.1
+          "min_clearance": 0.01
         }
       },
       "diff_pair_dimensions": [
@@ -72,7 +72,35 @@
           ""
         ],
         [
-          "clearance|89350000|115900000|a9c04bfe-ebc8-414d-bc93-2e910fedaacf|bcbae2bf-c0c6-4cbf-a921-c004a4a13862",
+          "clearance|96475000|100550000|7c2d07f3-59a5-48c8-8750-aebd9e86a83e|6c892870-6fbc-452d-8a1c-64a1f1dcb08c",
+          ""
+        ],
+        [
+          "clearance|96475000|95450000|86ed7cc3-4dcb-40d1-bb9e-1460edf0f795|c1d99d19-8084-4394-9490-debcd95fd981",
+          ""
+        ],
+        [
+          "clearance|96475000|96300000|c1d99d19-8084-4394-9490-debcd95fd981|0eec7ea8-427b-4943-b215-38b8a6f056d7",
+          ""
+        ],
+        [
+          "clearance|96475000|99700000|f2fd9d68-f706-41bf-ba0d-b74e3ae44f15|7c2d07f3-59a5-48c8-8750-aebd9e86a83e",
+          ""
+        ],
+        [
+          "clearance|97825000|100550000|9661b4c2-ac33-4d94-9cf8-b66be786afeb|4b60172a-e0b3-47e4-be0e-ed76ff891983",
+          ""
+        ],
+        [
+          "clearance|97825000|95450000|59bc41f9-06dd-45cc-89c9-4d9ba0e7c83e|6d348c88-d635-48ba-8f1f-a61219854bbb",
+          ""
+        ],
+        [
+          "clearance|97825000|96300000|7c881a6b-4df7-4f48-a962-cf1caee4131a|59bc41f9-06dd-45cc-89c9-4d9ba0e7c83e",
+          ""
+        ],
+        [
+          "clearance|97825000|99700000|4b60172a-e0b3-47e4-be0e-ed76ff891983|9c101602-9add-4b3d-9eb5-32eb54c1d338",
           ""
         ]
       ],
@@ -690,6 +718,20 @@
         "wire_width": 6
       },
       {
+        "clearance": 0.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_width": 0.25,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Power",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.25,
+        "via_diameter": 0.6,
+        "via_drill": 0.3
+      },
+      {
         "clearance": 0.25,
         "diff_pair_gap": 0.25,
         "diff_pair_width": 0.2,
@@ -697,7 +739,7 @@
         "microvia_drill": 0.1,
         "name": "SW",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 0,
+        "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.2,
         "via_diameter": 0.6,
@@ -711,7 +753,7 @@
     "netclass_assignments": null,
     "netclass_patterns": [
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "3V3"
       },
       {
@@ -723,15 +765,15 @@
         "pattern": "LED_SW"
       },
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "LDO_IN"
       },
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "B+"
       },
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "P+"
       },
       {
@@ -739,8 +781,24 @@
         "pattern": "EINK_SW"
       },
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "USB_VBUS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "VBUS_PRE_FUSE"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "PREVGH"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "PREVGL"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SD_VDD"
       }
     ]
   },

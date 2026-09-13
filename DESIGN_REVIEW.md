@@ -11,20 +11,20 @@
 
 ## Bottom line
 
-Topologically the schematic is **correct**. I traced all 126 nets and all 169 parts and found **no wiring errors** — the DW01A/FS8205A protection, the back-to-back FET battery disconnect, the TPS2116 power mux, the TP4056 charger, the e-paper charge pump, the SDIO bus, native USB, and the resistor-ladder buttons are all wired the way their datasheets specify. Pinouts are correct on every IC I checked, including the two easy ones to get wrong (FS8205A and DS3231MZ).
+Topologically the schematic is **correct**. I traced all 126 nets and all 173 parts and found **no wiring errors** — the DW01A/FS8205A protection, the back-to-back FET battery disconnect, the TPS2116 power mux, the TP4056 charger, the e-paper charge pump, the SDIO bus, native USB, and the resistor-ladder buttons are all wired the way their datasheets specify. Pinouts are correct on every IC I checked, including the two easy ones to get wrong (FS8205A and DS3231MZ).
 
 What's left is a set of **value / margin / documentation defects**, several of which will produce wrong behaviour on the first board:
 
-* the ~~USB-status ADC window is mis-scaled~~ ✅ **fixed** (`R17`=150 k) — and the `R38` change made the ambiguous second state physically unreachable
+* the ~~USB-status ADC window is mis-scaled~~ ✅ **fixed** (`R17`=150 k); at `R38`=300 k the one adjacent `ST`+`CHRG` state is reachable only from a weak USB source, but stays decodable and benign (§2.1 — re-evaluated)
 * the LED driver is a 24.5 V part still **documented** as 30 V, with a PWM note below its datasheet minimum ⬜ *2 of 3 note edits outstanding*
 * ~~a CMOS inverter input floats at boot~~ ✅ **fixed** (`R75` 100 k)
-* ~~the USB-priority threshold is set above the voltage USB_VBUS reaches under load~~ ✅ **fixed** (`R38`=240 k)
-* ⬜ **the 3.3 V LDO reaches thermal shutdown around 300–400 mA, and the LED boost still runs through it** — the `Q7` deletion (§6.14) fixes this
-* ~~**the ±15–22 V e-paper capacitors have no specified voltage rating**~~ ✅ **mostly fixed** — `C13`–`C17` and `C20` carry `/50V`; ⬜ **`C11` has reverted to plain `4.7u`** and should be restored (§6.19.5)
-* ~~**`D1` (series Schottky on VBUS) is redundant**~~ ✅ **RESOLVED** — `D1` removed and `R38` raised to 300 k. `F1` now feeds `USB_VBUS` directly; switchover is **3.68 / 4.00 / 4.32 V**, which clears the LDO's 3.72 V requirement while holding +0.22 V margin at 1 A (§6.20)
+* ~~the USB-priority threshold is set above the voltage USB_VBUS reaches under load~~ ✅ **fixed** (`R38`=300 k, `D1` removed)
+* ~~**the 3.3 V LDO reaches thermal shutdown around 300–400 mA, and the LED boost still runs through it**~~ ✅ **fixed** — the LED boost was moved off the LDO (`Q7` deleted, §6.14) and the LDO is now the lower-Iq, lower-dropout `TLV75533P` (§6.23)
+* ~~**the ±15–22 V e-paper capacitors have no specified voltage rating**~~ ✅ **fixed** — `C11`, `C13`–`C17` and `C20` all carry `/50V` (§6.19.5)
+* ~~**`D1` (series Schottky on VBUS) is redundant**~~ ✅ **RESOLVED** — `D1` removed and `R38` raised to 300 k. `F1` now feeds `USB_VBUS` directly; switchover is **3.68 / 4.00 / 4.32 V**, which clears the LDO's input requirement (now the lower-dropout `TLV75533P`, §6.23) while holding +0.22 V margin at 1 A (§6.20)
 * ~~**ERC still reports 1 error**~~ ✅ **fixed** — ERC is now **0 errors, 40 cosmetic warnings**
 
-**Status at the close of this review:** the schematic is electrically complete — every 🔴 and 🟡 item is resolved or consciously declined. Remaining ⬜ items are the `C11` annotation, two documentation-comment edits (§2.2/§2.3), and regenerating the stale BOM/netlist/gerbers. Placement/layout guidance is in **§8**.
+**Status at the close of this review:** the schematic is electrically complete — every 🔴 and 🟡 item is resolved or consciously declined. Remaining ⬜ items are two LED documentation-comment edits (§2.2/§2.3), updating the schematic switchover note (`~3.4V` → `~4.0V`, now that `R38` = 300 k), and regenerating the stale BOM/netlist/gerbers. Placement/layout guidance is in **§8**. *(Updated 2026-09-12 for the `TLV75533P` LDO swap, `C11` 50 V restore, and the `USB_STAT` re-evaluation at `R38` = 300 k.)*
 
 Full status table in **section 5**; per-block detail in **section 6**.
 
@@ -41,7 +41,7 @@ Verified pin-by-pin against datasheets — these are **right**, including the on
 | **DS3231MZ `VCC→GND`, `VBAT→3V3`** | ✔ Not a bug. This is the datasheet's *Figure 5 single-supply VBAT-only* configuration, which explicitly requires VCC **grounded** (not floating). See §5 for the firmware consequence. |
 | **`J2` pin 4 unconnected** | ✔ Correct — pin 4 is NC on the panel; the symbol's `VGL` label is wrong. See §2.4. |
 | **Back-to-back Q3/Q8 (AO3419)** | ✔ Correct bidirectional blocking pair; both channels conduct in either direction when on, and block on reverse battery. Q3 gate referenced to B− (cell), so it stays on when the protection FETs open — no oscillation loop. |
-| **TP4056** | ✔ `TEMP→GND` correctly disables the NTC (datasheet-sanctioned). `CE→VCC` is active-high enable, and CE is rated to 10 V so a 5 V tie is in spec. `R6 = 12 k → 1200/12k = 100 mA` ✔ matches your annotation. EPAD→GND with thermal vias ✔. |
+| **TP4056** | ✔ `TEMP→GND` correctly disables the NTC (datasheet-sanctioned). `CE→VCC` is active-high enable, and CE is rated to 10 V so a 5 V tie is in spec. `R6 = 4.7 k → ~255 mA` (raised from 12 k, §6.21). EPAD→GND with thermal vias ✔. |
 | **TPS2116 MODE→USB_VBUS** | ✔ Safe in all four quadrants. On unplug, PR1 falls below its threshold before MODE crosses V_IL, so you never land in the `MODE=low + PR1=high` **shutdown** state. |
 | **ADC pin selection** | ✔ All five analog nets are on **ADC1** (`IO1/CH0, IO2/CH1, IO4/CH3, IO8/CH7, IO9/CH8`). ADC2 is unusable with Wi-Fi — you avoided it. |
 | **Boot/reset straps** | ✔ `IO0`: 10 k pull-up + SW6 via 100 Ω to GND. `EN`: 10 k + 1 µF (10 ms) + SW11 via 100 Ω. Both correct. |
@@ -56,7 +56,7 @@ Verified pin-by-pin against datasheets — these are **right**, including the on
 
 ## 2. 🔴 Will produce wrong behaviour
 
-### 2.1 ~~USB-status ADC ladder~~ — **RESOLVED** (`R17` = 150 k, `R38` = 240 k both fitted)
+### 2.1 ~~USB-status ADC ladder~~ — **RESOLVED** (`R17` = 150 k, `R38` = 300 k both fitted)
 
 **Topology** (traced from the netlist):
 
@@ -72,33 +72,61 @@ Verified pin-by-pin against datasheets — these are **right**, including the on
 * **`CHRG`** (TP4056 pin 7): *"When the battery is being charged, the pin is pulled low by an internal switch, **otherwise pin is in high impedance state**."* → LOW = charging, Hi-Z = not charging.
 * **`STDBY`** (TP4056 pin 6): *"When the battery Charge Termination, the pin is pulled low … otherwise pin is in high impedance state."* → LOW = charge complete, Hi-Z otherwise. **One exception**, see the no-battery row below.
 * **`ST`** (TPS2116 §7.3.3): *"Pulled low when **VIN1 is not being used**… When the TPS2116 is powering the output using VIN2 **or both channels are disabled**, the ST pin will be pulled low. **During thermal shutdown, the ST pin will be pulled low regardless of the channel being used**."*
-  → **ST reports which input the mux selected, not whether USB is physically attached.** In this design `MODE` is tied to `USB_VBUS`, so "both channels disabled" is unreachable; ST therefore means *"the mux is running from the battery"*, which is true whenever `USB_VBUS` falls below the `PR1` threshold (now 3.40 V typ, 3.13–3.67 V) — plus the thermal-shutdown case.
+  → **ST reports which input the mux selected, not whether USB is physically attached.** In this design `MODE` is tied to `USB_VBUS`, so "both channels disabled" is unreachable; ST therefore means *"the mux is running from the battery"*, which is true whenever `USB_VBUS` falls below the `PR1` threshold (now 4.00 V typ, 3.68–4.32 V) — plus the thermal-shutdown case.
 
 **Reachable states, as built:**
 
 | Scenario | ST | CHRG | STDBY | `USB_STAT` |
 |---|:--:|:--:|:--:|---:|
-| USB in, charger not running (VBUS < ~4.0 V) | HiZ | HiZ | HiZ | **3.300 V** |
-| Unplugged, running on battery | **LOW** | HiZ | HiZ | **1.980 V** |
-| USB in, actively charging | HiZ | **LOW** | HiZ | **1.185 V** |
-| USB in, charge complete | HiZ | HiZ | **LOW** | **0.595 V** |
+| Idle (USB healthy, charger between states — transient) | HiZ | HiZ | HiZ | **3.300 V** |
+| On battery (unplugged, *or* USB present but too weak to charge) | **LOW** | HiZ | HiZ | **1.980 V** |
+| Charging (healthy USB) | HiZ | **LOW** | HiZ | **1.185 V** |
+| **Weak USB: charging while on battery** (see below) | **LOW** | **LOW** | HiZ | **0.956 V** |
+| Charge complete (battery full) | HiZ | HiZ | **LOW** | **0.595 V** |
 | **No battery** + ≥10 µF on BAT, blink phase A | HiZ | HiZ | **LOW** | 0.595 V |
 | **No battery** + ≥10 µF on BAT, blink phase B | HiZ | **LOW** | **LOW** | **0.450 V** |
 
-Worst-case adjacent separations: **1320 / 795 / 590 / 145 mV**. Only the last (0.595 ↔ 0.450) is tight, and both members mean "USB present, not charging normally" — so a single firmware bucket for < 0.7 V is sufficient.
+Worst-case adjacent separations: **1320 / 795 / 229 / 361 / 145 mV**. The two tight ones — 0.956 ↔ 1.185 (weak-USB vs charging) and 0.595 ↔ 0.450 (full vs no-battery) — both clear the ±30 mV ADC error comfortably, so every state decodes. Firmware windows are tabulated at the end of this section.
 
-**The `R38` fix closed the ambiguous state.** `ST`+`CHRG` (0.956 V) required the mux to be on battery *while* the charger still ran — i.e. `USB_VBUS` simultaneously below the switchover threshold and above the TP4056's ~4.0 V operating minimum:
+**The `ST`+`CHRG` state — what it means and why it's actually useful.** It looks like a contradiction ("`ST` = on battery, `CHRG` = plugged in"), but it isn't: **`ST` reports which input the mux *selected*, not whether a cable is attached.** `ST` goes low whenever `USB_VBUS` < the mux switchover `V_sw` — i.e. whenever the mux judges USB too low to run the load and hands over to the battery. USB can be plugged in *and charging* while the mux runs the load from the battery. So `ST`+`CHRG` has a precise, useful meaning: **"USB is attached and charging, but the source is too weak to run the system, so the load is on the battery."** That is a real "your charger/cable is marginal" signal — firmware should surface it, not suppress it (see the decode table).
 
-| | Switchover (worst case) | Charger minimum | Overlap window |
+**It only appears with a bad source — quantified.** With `D1` removed, only `F1` (R1max ≈ 0.21 Ω) sits between the connector and `USB_VBUS`, so for the mux to hand to battery, `USB_VBUS` must fall below `V_sw` (≤ 4.32 V worst case). A compliant source cannot drag it that low:
+
+| Source | Total current (system + charge) | `USB_VBUS` after `F1` | vs 4.32 V `V_sw,max` |
 |---|---:|---:|---|
-| Before (`R38` = 310 k) | 4.43 V | 4.00 V | **[4.00, 4.43] — reachable** |
-| **Now (`R38` = 240 k)** | 3.67 V | 4.00 V | **empty — unreachable** ✔ |
+| 5.00 V | 0.6 A | 4.87 V | +0.55 V — mux stays on USB |
+| 5.00 V | 1.0 A | 4.79 V | +0.47 V — stays on USB |
+| 4.75 V (USB 2.0 minimum) | 1.0 A | 4.54 V | +0.22 V — still stays on USB |
 
-So `ST`+`CHRG`, `ST`+`STDBY` and all-three are now all physically impossible, and the five remaining states are unambiguous.
+So `ST`+`CHRG` occurs **only** when the source itself sags below ~4.3 V — a dying power bank, a high-resistance cable, or a non-compliant charger. In any normal setup it never happens; when it does, it correctly diagnoses the source rather than indicating a board fault.
+
+**The charger floor is battery-dependent, not a fixed 4 V (correcting an earlier simplification).** The TP4056 has no crisp "4 V or it won't charge" threshold. Charging is gated by its **sleep comparator** — it stops, and `CHRG` goes Hi-Z, once `VCC` falls to within ~30 mV of `VBAT` — plus a little pass-transistor headroom, and an input UVLO whose value is inconsistently specified across the TP4056's many datasheets and clones. So the effective floor is roughly `max(UVLO, VBAT + ~30 mV + dropout)`: ~4.1–4.2 V for a nearly-full cell, ~3.4–3.6 V for a depleted one. The "~4.0 V" used below is a mid-charge stand-in, not a spec — it only sets *how wide* the `ST`+`CHRG` band is; the binding condition is always `USB_VBUS < V_sw`, which per the table above needs a bad source regardless.
+
+**Why it can't simply be designed out at 300 k.** Sweeping `USB_VBUS` upward, `ST`+`CHRG` lives in the band `V_chg < USB_VBUS < V_sw`, so it exists only when **`V_sw > V_chg`**:
+
+| | `V_sw` (worst case) | charger floor `V_chg` | `ST`+`CHRG` band |
+|---|---:|---:|---|
+| `R38` = 240 k | 3.67 V | ~4.0 V | none (`V_sw` < `V_chg`) — impossible |
+| **`R38` = 300 k** (now) | 4.32 V | ~4.0 V | [~4.0, 4.32 V] on a high-`V_REF` part |
+
+Setting `V_sw` below `V_chg` (`R38` ≤ ~270 k) closes the band — but it reopens a **brown-out**: `V_sw,min` must also stay above the LDO dropout floor (`TLV75533P` ≈ 3.6 V under load, §6.20.5), which needs `R38` ≥ ~290 k. **The two requirements don't overlap.** The reason is fundamental: the TPS2116 `V_REF` spread is ±8 % (0.92–1.08 V, **1.17×**), wider than the guard band between the LDO floor and the charger floor (4.0 / 3.6 ≈ **1.11×**). No single `R38` satisfies both — so lowering it (my earlier "free refinement" — wrong) would trade a benign, decodable state for a hard rail collapse on low-`V_REF` parts.
+
+**Conclusion — keep `R38` = 300 k** and treat `ST`+`CHRG` (0.956 V) as a first-class *diagnostic*, not a fault. Brown-out is a hard failure; `ST`+`CHRG` is soft — it decodes ~230 mV clear of `CHRG`, appears only with a bad source, and tells you exactly that. The only way to *guarantee* it never appears is to drop the ±8 % ambiguity by driving `PR1` from a GPIO in the TPS2116's manual mode instead of a fixed divider — not worth it here. `ST`+`STDBY` and all-three stay effectively unreachable (a "full" battery under battery-load discharges immediately).
+
+**Firmware decode — the windows to implement:**
+
+| `USB_STAT` window | State | Meaning / action |
+|---|---|---|
+| > 2.6 V | idle | USB healthy, charger between states (transient) |
+| 1.55 – 2.6 V | on battery | unplugged, *or* USB too weak to charge — running on battery |
+| 1.05 – 1.55 V | charging | healthy USB, charging normally |
+| **0.78 – 1.05 V** | **weak USB source** | attached & charging but too weak to run the load — **flag the charger/cable as marginal** |
+| 0.52 – 0.78 V | full **or** no battery | static ⇒ battery full; alternating with the row below on a 1–4 s cycle ⇒ no battery fitted |
+| < 0.52 V | no battery (blink) | pairs with ~0.6 V on a 1–4 s cycle |
 
 **Two edge cases to handle in firmware:**
 
-1. **A collapsing charger reads as "unplugged".** If `USB_VBUS` sags below ~3.4 V while still physically connected, the mux hands to the battery (ST LOW) and the charger stops (both Hi-Z) → 1.980 V, which your table labels "discharging / unplugged". The *diagnosis* is wrong but the *conclusion* is right — the system genuinely is running on battery. Benign, but don't use `USB_STAT` alone to decide whether a cable is attached.
+1. **A collapsing charger reads as "unplugged".** If `USB_VBUS` sags below ~4.0 V while still physically connected, the mux hands to the battery (ST LOW) and the charger stops (both Hi-Z) → 1.980 V, which your table labels "discharging / unplugged". The *diagnosis* is wrong but the *conclusion* is right — the system genuinely is running on battery. Benign, but don't use `USB_STAT` alone to decide whether a cable is attached.
 2. **`STDBY` LOW does not always mean "charged".** With no battery fitted, the TP4056 holds `STDBY` low continuously while `CHRG` blinks at 1–4 s (datasheet LED table: *"Green LED bright, Red LED Coruscate T = 1-4 S"*). `C3` (10 µF) + `C26` (1 µF) sit on the BAT pin, so this board matches that row exactly. **Detect it by the transition**: a reading that alternates 0.595 ↔ 0.450 V on a 1–4 s period is "no battery", not "charged". A static 0.595 V is a real termination.
 
 **⚠ Still worth measuring:** the 1.980 V unplugged state assumes the TP4056's status pins are true Hi-Z while the chip is unpowered. Its datasheet **does not rate those pins at all**. If they clamp through an ESD path to a 0 V VCC, state 1 collapses toward ~0.93 V. One bench check on the first board settles it.
@@ -137,7 +165,7 @@ The `FH34SRJ-24S-0.5SH_50_` symbol labels pin 4 `VGL`, which made an unconnected
 | J2 pin | Actual | Net | |
 |---|---|---|---|
 | 4 | **NC** | *unconnected* | ✔ correct — symbol says `VGL`, wrong |
-| 5 | VGH | C17 4.7 µF | ✔ |
+| 5 | VSH2 | C17 4.7 µF/50 V | ✔ (symbol confirmed VSH2, not VGH) |
 | 21 / 23 | PREVGH / PREVGL | C14 / C16 4.7 µF | ✔ |
 | 20 / 22 | VSH / VSL | C13 / C15 4.7 µF | ✔ |
 | 18 / 19 / 24 | VDD / VPP / VCOM | C18 / C19 / C20 1 µF | ✔ |
@@ -158,13 +186,13 @@ The `FH34SRJ-24S-0.5SH_50_` symbol labels pin 4 `VGL`, which made an unconnected
 
 | Contributor | Current |
 |---|---|
-| AP2112K quiescent | 55 µA |
+| TLV75533P quiescent | 25 µA |
 | `USB_STAT` ladder (ST asserted, R17=150k) | 13 µA |
 | `R57`/`R56` gate divider (**now 1M/10k**) | 4 µA |
 | `BAT_MONIT` divider (2 M) | 2 µA |
 | DW01A | 3 µA |
 | ESP32-S3 deep sleep | 10–20 µA |
-| **Total** | **≈ 90–100 µA** |
+| **Total** | **≈ 60–70 µA** |
 | **Floating inverter input** | **500–2000 µA** |
 
 A floating input is **5–20× the entire rest of the board**, turning a months-long shelf life into days. Secondary effects: the output can oscillate (an inverter biased in its linear region is a high-gain amplifier, and this node runs next to a switching converter), and `Q5`/`Q6` can be partly on together — though that one is benign here because `R40` holds `Q7` off so `U10` is unpowered at boot.
@@ -189,7 +217,7 @@ Short answer: **the pull resistor has no effect on switching speed, because it n
 
 ## 3. 🟡 Margin problems
 
-### 3.1 ~~USB-priority threshold~~ — ✅ FIXED (`R38` = 240 k)
+### 3.1 ~~USB-priority threshold~~ — ✅ FIXED (`R38` = 300 k via §6.20; the interim analysis below used 240 k)
 
 `R38 = 310 k`, `R51 = 100 k`, TPS2116 `V_REF = 1.00 V` (0.92 – 1.08 V):
 
@@ -227,7 +255,7 @@ It also corrupts the status readout — this is the direct cause of the reachabl
 V_switchover = 3.40 V typ  (3.13 – 3.67 V)
 ```
 
-Margin becomes **+0.27 V even at 1 A from a 4.75 V source**, and +0.74 V at light load. The threshold still sits above the point where the LDO can no longer hold 3V3 (needs ≥3.72 V input at 600 mA worst case), so genuine brown-out handover still works.
+Margin becomes **+0.27 V even at 1 A from a 4.75 V source**, and +0.74 V at light load. The threshold still sits above the point where the LDO can no longer hold 3V3 (the fitted `TLV75533P` needs only ~3.5–3.7 V input at its working load), so genuine brown-out handover still works.
 
 **Fix B — better, if you're revising the board: also replace `D1` with a 0 Ω link, and set `R38` = 300 k.** See **§6.20**, where this is now fully verified against datasheets and worked through numerically.
 
@@ -237,7 +265,9 @@ Margin becomes **+0.27 V even at 1 A from a 4.75 V source**, and +0.74 V at ligh
 
 **A tempting trick to avoid:** adding a feedback resistor from `ST` back to `PR1` would synthesise hysteresis (ST pulls low on battery, dragging PR1 down and latching the decision). It works electrically, but `ST` is also the 150 k leg of the `USB_STAT` ladder — the feedback resistor would inject the PR1 divider into the status ladder whenever ST is Hi-Z and corrupt every reading in §2.1. If you want hysteresis, use a spare GPIO and the TPS2116's manual mode instead.
 
-### 3.2 ✅ **LARGELY RESOLVED** — AP2112K-3.3 thermal (LED boost moved off the 3V3 rail)
+### 3.2 ✅ **RESOLVED** — 3.3 V LDO thermal (LED boost off the rail; LDO now `TLV75533P`)
+
+> **Update:** the LED boost is off the LDO (item 15 / §6.14) and `U3` is now the **`TLV75533P`** (§6.23). It is the same SOT-23-5 (DBV) package, so the thermal *ceiling* in the table below is unchanged — but the ~131 mA LED load that drove the LDO toward it is gone, and the TLV's lower dropout means less dissipation at battery voltages. The sustained 3V3-domain load is now ~150–250 mA (Wi-Fi TX peaks ride the ~25 µF bulk), comfortably inside the package even at USB `V_IN`. The analysis below is retained as the motivation for both changes; it no longer describes a live risk.
 
 I originally called this "little current headroom". Computing the dissipation makes it much more serious. SOT-23-5 with no thermal pad, `R_θJA` ≈ 250 °C/W on a small copper island (150 °C/W with a generous pour — use both bounds):
 
@@ -459,7 +489,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 * `production_files/` gerbers, BOM and CPL are from **2026-08-13**.
 
 **Verify before ordering:**
-* **ESP32-S3-WROOM-1 variant.** Your note *"ESP32-S3-WROOM-1 does not reserve GPIO for PSRAM"* is only true for the **non-octal** variants. `TP3/TP4/TP5` sit on IO35/36/37, which **are** consumed by octal PSRAM. Pin the BOM to a specific MPN — `N4`/`N8`/`N16` or `N8R2`/`N16R2` (quad PSRAM, uses the flash bus). **Do not order `N8R8`/`N16R8`.**
+* **ESP32-S3-WROOM-1 variant.** Your note *"ESP32-S3-WROOM-1 does not reserve GPIO for PSRAM"* is only true for the **non-octal** variants — on octal-PSRAM parts IO35/36/37 are consumed internally. Since those three pins are **not broken out** on this board (IO35–37 have no pads/vias — §6.13), the fitted **`N8R8`** is fine. Pin the BOM to your intended MPN so a build gets the right flash/PSRAM size and RF calibration.
 * **FS8205A vs FS8205 naming.** Fortune's own `FS8205A-DS-17_EN.pdf` describes a **TSSOP-8** part; the SOT-23-6 device is documented as **`FS8205`** (rev 1.7). LCSC C32254 is the SOT-23-6 one. Your footprint is SOT-23-6, so order **C32254** and don't let a distributor substitute a TSSOP-8 "FS8205A". Also: older FS8205 datasheets (rev <1.4) show a *different* pinout — only trust rev ≥1.7.
 * **J2 pins 1/6/7** (`HLT_CTL`, `TSCL`, `TSDA`) left NC — correct for a non-touch panel driven without HLT_CTL, but confirm against your exact 4.26" panel.
 * **`C19` on `VPP`** (J2 pin 19). VPP is the OTP programming pin; most reference designs leave it NC. A 1 µF to GND is harmless but check the panel datasheet.
@@ -508,7 +538,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 1 | `R17` 100 k → **150 k** | reads `150k` |
 | 3 | **`R75` 100 k pull-down on `COLOR_SEL`** | present, `100k` |
 | 10 | **`R76` 100 k pull-down on `PWR_BUTTON`** | present, `100k` → pressed reads 3.00 V, 525 mV over VIH |
-| 6 | `R38` 310 k → **240 k** | reads `240k` |
+| 6 | `R38` 310 k → **300 k** (with `D1` removed) | reads `300k`; switchover 3.68/4.00/4.32 V (§6.20) |
 | 7 | `R57`/`R56` → **1 M / 10 k** | reads `1M` / `10k` |
 | 11 | `C9` 1 µF → **4.7 µF**, annotated 50 V | reads `4.7u` |
 | 12 | `D3` SMAJ30A → **SMAJ26A** | reads `SMAJ26A` |
@@ -527,12 +557,17 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 14 | **`J6` re-ordered — fuller fix applied** | `4=GND, 8=SDA, 12=P+`. `LED_SW` now bounded only by GND/W−/C−; `P+` cornered by the LED returns |
 | 31 | **`L1` → `VLS3012HBX-220M`** | Metal-composite, 1.2 mm tall, dual-sourced |
 | 2 | **`J2` symbol pin names corrected** | pin 4 now `NC`; VGH/VGL/VSH/VSL now read correctly |
-| 34 | **Stale `Switchover at ~4.1V` note → `~3.4V`** | Matches `R38` = 240 k |
+| 34 | Schematic switchover note reads `~3.4V` | ⬜ **now stale** — `R38`=300 k makes it ~4.0 V; update the note |
 | 4 | **LED note corrected** | now reads `10kHz-25kHz` and `0-24.5V` |
 | 31a | **`L1` replacement chosen: `VLS3012HBX-220M`** | annotated on the sheet (see ⚠️ below about where it needs to go) |
 | 21a | **50 V annotated on `C13`–`C17`, `C20`, `C9`** | text placed beside each cap (see ⚠️ below) |
+| — | **`D1` removed; `F1` feeds `USB_VBUS` directly** | schematic + PCB confirm no `D1` (§6.20) |
+| — | **`R6` 12 k → 4.7 k (charge ~255 mA)** | reads `4.7k` (§6.21) |
+| — | **`U3` AP2112K-3.3 → `TLV75533PDBVR`** | schematic + PCB read `TLV75533PDBV`; 25 µA Iq (§6.23) |
+| — | **`C11` 50 V rating restored** | reads `4.7u/50V` (§6.19.5) |
+| — | **`J2` pin 5 confirmed `VSH2`** (not VGH) | symbol double-checked (§2.4) |
 
-**Bonus outcome:** items 1 + 6 together make the previously-ambiguous `ST`+`CHRG` ADC state **physically unreachable** (§2.1) — the mux switchover ceiling, 3.67 V, is now below the TP4056's ~4.0 V operating floor, so the two can no longer both assert.
+**Bonus outcome:** at `R38` = 240 k this made the ambiguous `ST`+`CHRG` state unreachable. At the final `R38` = 300 k (§6.20) it is reachable only from a weak USB source, but stays decodable and benign — see the re-evaluation in **§2.1**.
 
 ---
 
@@ -552,7 +587,7 @@ P+ ──[R1 100 Ω]──┬── U5.5  (DW01A VCC)
 | 14 | `J6`: swap `SDA` (pin 4) ↔ `GND` (pin 12) | Only real HV adjacency; `W−`/`C−` turned out to be low-voltage nets |
 | 2 | `J2` symbol: pin 4 `VGL` → **NC**, audit the other 23 names | Circuit is correct; the symbol caused a false finding |
 | 18 | Resolve 6 `lib_symbol_mismatch`; **regenerate BOM / netlist / gerbers** | Artefacts are 3–5 weeks stale and materially wrong |
-| 17 | **`N8R8` is fitted**: keep TP3/4/5 stubs <2 mm or DNP-jumper them, and silkscreen the restriction | IO35–37 are the octal-PSRAM bus on `R8` parts |
+| 17 | ✅ **`N8R8` fitted; IO35–37 not broken out** (no pads/vias), so nothing loads the octal-PSRAM bus (§6.13) | — |
 | 20 | **Bench-measure `USB_STAT` unplugged** — expect 1.98 V | ~0.93 V means TP4056 ESD backfeed; its datasheet doesn't rate those pins |
 
 **Optional:**
@@ -761,29 +796,19 @@ Traced completely: `3V3 → L1 22 µH → EINK_SW → Q4(BSS138) → RESE → R1
 At 24.5 V out, 15 mA, D = 0.865: `V_ripple = I×D/(C×f)`.
 Nominal 1 µF → 11.8 mV. **Derated to ~0.35 µF (1 µF 50 V 0805 at 20 V bias) → 34 mV.** With 2.2 µF (≈0.8 µF derated) → 15 mV. Confirms item 11 — not dangerous, but the derated part gives ~3× the intended ripple, which modulates LED current and shows up on `LED_MONIT`.
 
-### 6.13 🟢 `TP3`/`TP4`/`TP5` are octal-PSRAM pins on the fitted `N8R8`
+### 6.13 ✅ IO35/36/37 (octal-PSRAM pins) — not broken out
 
 ESP32-S3-WROOM-1 datasheet v1.8, Table 3-1, footnote b:
 
 > *"For modules with Octal SPI PSRAM … pins **IO35, IO36, and IO37 are connected to the Octal SPI PSRAM and are not available for other uses**."*
 
-| Fitted module | IO35/36/37 | TP3/4/5 |
-|---|---|---|
-| **N4 / N8 / N16** (no PSRAM) | free | usable |
-| **N8R2 / N16R2** (quad PSRAM, shares flash bus) | free | usable |
-| **N8R8 / N16R8** (octal PSRAM) ← *fitted* | PSRAM DQ6/DQ7/DQS | **do not connect** |
-
-The board ships with an `R8` part, so on the current build these pads sit on a DDR bus running
-at 80–120 MHz. That is manageable but not free:
-
-1. **Keep the stub microscopic** — TP pad hard against the module pad, no routed trace. 1–2 mm
-   adds ~1 pF and is harmless; 10 mm across the board is not.
-2. **Better: DNP-jumper them.** A `0 Ω` (DNP) between each module pin and its TP pad means an
-   `R8` build has *no* stub at all, and a non-octal build just gets three jumpers fitted.
-3. **Mark the restriction** — silkscreen or schematic note: *"IO35–37: do not connect on
-   octal-PSRAM (R8) modules."* Exactly the kind of constraint that gets lost between revisions.
-
-Pin the intended variant in the BOM either way.
+The old future-proofing plan (pads to reach IO35–37 on non-octal modules) was **dropped** —
+IO35–37 have no pads or vias on this board. On the fitted **`N8R8`** those three pins carry the
+octal-PSRAM DDR bus, and because nothing connects to them there is **no stub to manage and no
+restriction to silkscreen** — the earlier concern is moot. (The `TP3`–`TP5` designators were
+later reused for the frontlight driver — `LED_SW`/`C−`/`W−` — not for these pins; see §6.18.)
+Pin the intended module variant in the BOM regardless, since flash/PSRAM size and RF calibration
+differ.
 
 ### 6.14 ✅ **`Q7` freed and reused — DONE.** LED boost now runs from `LDO_IN`; `Q7` became the SD load switch
 
@@ -797,7 +822,7 @@ So: **delete `Q7` and `R40`, and connect `U10.VIN` directly to `LDO_IN`.** Contr
 
 This resolves four open items simultaneously:
 
-1. **§3.2 LDO thermal** — removes the 131 mA LED load from the AP2112K entirely.
+1. **§3.2 LDO thermal** — removes the 131 mA LED load from the LDO entirely.
 2. **Your 7b concern** — with no `Q7`, nothing pulls a gate to `LDO_IN`, so no ESP32 pin is ever exposed above 3.3 V. `ADIM` is rated to **5.5 V abs max** and needs only **1.2 V** for a logic high, so a 3.3 V GPIO drives it correctly even with `U10` running from a 5 V `LDO_IN`.
 3. **Eliminates the double conversion** — battery → LDO → boost becomes battery → boost.
 4. **Frees the load switch for the microSD** (your condition on should-fix #10) — a net-zero part count change.
@@ -947,8 +972,8 @@ There is a real trade here and it should be resolved with a measurement rather t
 * **Only 5 `PWR_FLAG`s and 0 hierarchical sheets** for a 167-part design on one A2 page. The flat single-sheet approach is why the `4-way junction` and `multiple net names` warnings exist. If you revise, splitting into sheets (Power / MCU / Display / IO) would make the next review far cheaper — 173 global labels on one sheet is a lot to hold in your head.
 * **`U12` pin 1 (NC)** is left open ✔ correct for the DBV package.
 * **`Q1` pins 2 and 5 (the FS8205A common drain) intentionally unconnected** ✔ correct — they are the internal mid-node. Keep them soldered for thermal reasons.
-* **Mounting holes `H1`–`H4` are all `MountingHole_Pad` tied to GND** — fine, but that means four chassis-coupled points. If the enclosure is metal, consider one solid GND and three isolated (or capacitively coupled) to avoid a ground loop through the case.
-* **Test points `TP1`–`TP5`** cover RX, TX and the three PSRAM-capable pins. Sensible. Consider adding TPs on `LDO_IN`, `P+` and `USB_STAT` — those are the three nodes this review says to measure.
+* **Mounting holes `H1`–`H5` are all `MountingHole_Pad` tied to GND** — fine, but that means five chassis-coupled points. If the enclosure is metal, consider one solid GND and the rest isolated (or capacitively coupled) to avoid a ground loop through the case.
+* **Test points `TP1`–`TP5`:** `TP1`/`TP2` = UART `RX`/`TX`; `TP3`/`TP4`/`TP5` = `LED_SW`/`C−`/`W−` (frontlight-driver probing, added in the layout pass). Still worth considering: TPs on `LDO_IN`, `P+` and `USB_STAT` — the three power nodes this review flags for measurement.
 
 ---
 
@@ -1000,7 +1025,7 @@ DC-bias derating, from Murata SimSurfing exports (25 °C):
 | `C14` | 4.7 µF/50 V | `PREVGH`, +22 V | Gate-drive reservoir |
 | `C15` | 4.7 µF/50 V | J2 pin 22, −15 V | No 0603 part exists |
 | `C16` | 4.7 µF/50 V | `PREVGL`, −22 V | Gate-drive reservoir |
-| `C17` | 4.7 µF | J2 pin 5 (VGH), 22 V | No 0603 part exists |
+| `C17` | 4.7 µF/50 V | J2 pin 5 (VSH2), 22 V | No 0603 part exists |
 
 **Tier B — strongly recommend staying 0805 (value exists but capacitance collapses):**
 
@@ -1033,14 +1058,14 @@ Note the saving is mostly in **width**, not length: 1.90 → 1.46 mm (−23 %) v
 
 Also note the `_HandSolder` 0603 is only 0.34 mm longer than the plain 0603 and **identical in width**, so there is no density argument for giving up the extended pads. Keep the hand-solder variants.
 
-#### 6.19.5 🟡 Voltage-rating annotation gaps found during this audit — **one regression**
+#### 6.19.5 ✅ Voltage-rating annotations — **RESOLVED**
 
-Item 21 of §5 added `/50V` to `C13`–`C16` and `C20`. Two caps were missed at the time; both were subsequently annotated, but **one has since reverted:**
+Item 21 of §5 added `/50V` to `C13`–`C16` and `C20`. The two caps missed at the time are now both annotated:
 
-* ✅ **`C17` (4.7 µF, J2 pin 5 / VGH, +22 V)** — reads `4.7u/50V`. Confirmed.
-* ⬜ **`C11` (4.7 µF, `EINK_SW` ↔ `Net-(D4-K)`)** — was annotated `4.7u/50V`, **now reads plain `4.7u` again.** `C13`–`C17` and `C20` all retained theirs, so this looks like an accidental revert rather than a decision.
+* ✅ **`C17` (4.7 µF, J2 pin 5 / VSH2, +22 V)** — reads `4.7u/50V`. Confirmed.
+* ✅ **`C11` (4.7 µF, `EINK_SW` ↔ `Net-(D4-K)`)** — now reads `4.7u/50V`. Confirmed (was briefly reverted to plain `4.7u`; restored).
 
-`C11` is the one that least deserves to lose its rating. Unlike the reservoir caps, which sit at a static DC bias, it is a **flying capacitor that swings the full 0 → ~23 V every switching cycle**, so it sees continuous large-signal AC stress on top of the DC rating. It needs an explicit **50 V**, and **X7R is preferred over X5R** here for exactly that reason — worth stating in the BOM rather than leaving it to whatever an assembler picks for "4.7u".
+`C11` is the one that most needs the rating. Unlike the reservoir caps, which sit at a static DC bias, it is a **flying capacitor that swings the full 0 → ~23 V every switching cycle**, so it sees continuous large-signal AC stress on top of the DC rating. The explicit **50 V** is correct, and **X7R is preferred over X5R** here for exactly that reason — worth stating in the BOM rather than leaving it to whatever an assembler picks for "4.7u".
 
 ---
 
@@ -1103,7 +1128,7 @@ The thermal trade is bad in both directions. `D1` lowers TP4056 `V_CC`, moving ~
 
 `R38` = 240 k, `R51` = 100 k, `V_REF` = 0.92/1.00/1.08 V → **V_switchover = 3.13 / 3.40 / 3.67 V**.
 
-The AP2112K needs **≥3.72 V** to hold 3V3 at 600 mA (§3.2). So a window exists where the mux holds the system on a sagging USB rail *while the LDO browns out*, with a healthy battery available. Raising `R38` is the fix — but `D1` eats the headroom that would allow it:
+The LDO needs enough input to avoid dropout: the original AP2112K wanted **≥3.72 V** at 600 mA; the now-fitted `TLV75533P` needs only **~3.5–3.7 V** at its ~150–250 mA working load. Either way a window can exist where the mux holds the system on a sagging USB rail *while the LDO browns out*, with a healthy battery available. Raising `R38` was the fix — but `D1` ate the headroom that would allow it:
 
 | Source 4.75 V, `F1` at R1max | with `D1` | without `D1` |
 |---:|---:|---:|
@@ -1121,9 +1146,11 @@ This is **open hardware with builder-sourced parts, and counterfeit TP4056s are 
 
 #### 6.20.7 ✅ Recommendation — **IMPLEMENTED**
 
-✅ **`D1` removed** (`F1` now feeds `USB_VBUS` directly) and **`R38` raised to 300 k**. Verified in the netlist: 169 components / 126 nets, ERC 0 errors.
+✅ **`D1` removed** (`F1` now feeds `USB_VBUS` directly) and **`R38` raised to 300 k**. Verified in the netlist: 126 nets, ERC 0 errors. *(Board now 173 components after the layout-pass test points / mounting hole; nets unchanged.)*
 
-New switchover threshold: **3.68 / 4.00 / 4.32 V** (min/typ/max over `V_REF` tolerance). That finally puts the worst case at the AP2112K's 3.72 V requirement while holding **+0.22 V margin at 1 A** from a worst-case 4.75 V source — the §3.1 brown-out window is closed. Net effect: 0.3–0.6 V of rail headroom recovered, 200–600 mW of dissipation eliminated, and a thermal over-stress removed.
+New switchover threshold: **3.68 / 4.00 / 4.32 V** (min/typ/max over `V_REF` tolerance). That put the worst case at the original AP2112K's 3.72 V requirement while holding **+0.22 V margin at 1 A** from a worst-case 4.75 V source — the §3.1 brown-out window is closed. Net effect: 0.3–0.6 V of rail headroom recovered, 200–600 mW of dissipation eliminated, and a thermal over-stress removed.
+
+> **Re-evaluated after the `TLV75533P` swap:** the TLV's lower dropout keeps the brown-out floor around ~3.6 V, so 300 k's `V_sw,min` = 3.68 V still clears it. The side effect is that the worst-case switchover (4.32 V) sits above the TP4056's ~4.0 V floor, re-opening a narrow, weak-source-only `ST`+`CHRG` window on `USB_STAT` — decodable and benign. It **cannot be designed out without risking brown-out**: the ±8 % `V_REF` spread (1.17×) is wider than the LDO-floor-to-charger-floor guard band (~1.11×), so no single `R38` satisfies both floors at once. Keep 300 k and handle `ST`+`CHRG` in firmware — full evaluation in **§2.1**.
 
 The DNP-diode-in-parallel-with-0 Ω escape hatch (§6.20.6) was **not** fitted. If counterfeit TP4056s become a reported problem in the wild, that is the cheap retrofit.
 
@@ -1173,7 +1200,9 @@ Six `U4` pins were swapped during placement, presumably to shorten routes. All v
 
 Also note IO10 (an ADC1-capable pin) now carries `SD_ACTIVATE`, a digital output. Not an error — you have ADC1 pins to spare — just a mild waste of an analog-capable pin if you ever want a sixth analog input.
 
-### 6.23 🟢 **NEW** — LDO alternatives for lower quiescent current (`U3` AP2112K, battery-life study)
+### 6.23 ✅ **IMPLEMENTED** — LDO swapped to `TLV75533P` for lower quiescent current (battery-life study)
+
+> **Status:** done — `U3` is now the **`TLV75533PDBVR`** (the 🥇 recommendation below). Standby drops to ~60–70 µA (§2.5), from ~90 µA. The pin 1/5 swap vs the AP2112K was handled in the layout. The study that led here is retained below.
 
 Assessed for a **500 mAh single-cell LiPo** build. The goal is more battery life without giving up stability, so this stays an **LDO** (a buck-boost was considered and set aside — a switching node on the 3V3 rail would inject ripple into the ratiometric button ladders and the RF supply on a 2-layer board). The AP2112K's **55 µA quiescent current is the single largest term in the ~90 µA standby budget** (§2.5 table), so a lower-Iq LDO is the cheapest lever available.
 
@@ -1183,7 +1212,7 @@ Standby cell current = **35 µA non-LDO floor + Iq_LDO** (13 µA `USB_STAT` ladd
 
 | Part | Iq (typ) | Cell sleep | Standby (500 mAh) | vs AP2112K |
 |---|---:|---:|---:|---:|
-| AP2112K (current) | 55 µA | 90 µA | 231 d (7.6 mo) | — |
+| AP2112K (former baseline) | 55 µA | 90 µA | 231 d (7.6 mo) | — |
 | MIC5504-3.3 | 38 µA | 73 µA | 285 d (9.4 mo) | +23% |
 | TLV75533P | 25 µA | 60 µA | 347 d (11.4 mo) | +50% |
 
@@ -1208,7 +1237,7 @@ Two package-expansion options (accepting the small-leaded DRL/SOT-563 tier) were
 
 Both surviving candidates are from single-source vendors with lifecycle transparency (no clone ambiguity):
 
-* 🥇 **TLV75533PDBVR (TI)** — best all-round: 500 mA full headroom, lowest Iq (25 µA → +50% standby), and at ~$0.080 on LCSC it is **at price parity with the genuine AP2112K** (within the ≤20% budget). The one cost is that **pins 1 and 5 (OUT/IN) are swapped** vs the AP2112K, so it needs a footprint pin-map change + reroute of the `VIN`/`VOUT` nets — a minor, one-time layout edit worth doing during a revision.
+* 🥇 **TLV75533PDBVR (TI)** — ✅ **fitted.** Best all-round: 500 mA full headroom, lowest Iq (25 µA → +50% standby), and at ~$0.080 on LCSC it is **at price parity with the genuine AP2112K** (within the ≤20% budget). The one cost was that **pins 1 and 5 (OUT/IN) are swapped** vs the AP2112K, so it needed a footprint pin-map change + reroute of the `VIN`/`VOUT` nets — a minor, one-time layout edit, now done.
 * 🥈 **MIC5504-3.3YM5-TR (Microchip)** — the true zero-layout-change drop-in (pin-for-pin identical; `EN`-to-`VIN` tie carries over), but 300 mA, less Iq gain (+23%), and ~+39% price (~$0.118, absolute delta ~3.5 ¢). Choose this if avoiding any layout change outranks the extra headroom/µA.
 
 **Caveats for both:** abs-max V_IN is **5.5 V** (vs the AP2112K's 6 V); worst-case `LDO_IN` (USB high, light load) is ~5.2 V — inside spec but with less margin, and hot-plug ringing leans on `CR1` to clamp. Verify the worst-case `LDO_IN` maximum before committing.
@@ -1263,11 +1292,11 @@ The critical AC loop is **`U10.VOUT → C9 → GND → U10.GND(4)`**. At 1.1 MHz
 
 ### 8.4 Power path and the thermal cluster
 
-The chain is `J1 → F1 → D1 → USB_VBUS → {U11 TP4056, U2 TPS2116 VIN1}`, `P+ ← U11.BAT`, `U2.VIN2 ← P+`, `U2.VOUT → LDO_IN → U3 AP2112K → 3V3`.
+The chain is `J1 → F1 → USB_VBUS → {U11 TP4056, U2 TPS2116 VIN1}`, `P+ ← U11.BAT`, `U2.VIN2 ← P+`, `U2.VOUT → LDO_IN → U3 TLV75533P → 3V3`.
 
-* ⬜ **Resolve `D1` before placing** (§6.20). If you remove it, the `F1 → USB_VBUS` run becomes a straight shot and the footprint disappears from the cluster. Deciding this *after* placement means redoing it.
+* ✅ **`D1` removed** (§6.20) — the `F1 → USB_VBUS` run is a straight shot and its footprint is gone from the cluster.
 * **`U11` (TP4056) is the hottest part** at ~194 mW worst case, and it is an ESOP-8 that dissipates through its exposed pad. Give it the thermal-via field the footprint expects and a **generous copper pour** — the pad is the heatsink. Do not crowd it with `U3`.
-* **`U3` (AP2112K) is thermally limited** (§3.2, SOT-23-5, no pad, R_θJA 150–250 °C/W). It needs its own copper island. **Keep `U3` and `U11` apart** — they are the two heat sources and they are on the same rail.
+* **`U3` (TLV75533P) is still SOT-23-5** (§3.2, no pad, R_θJA 150–250 °C/W) — give it its own copper island. **Keep `U3` and `U11` apart** — they are the two heat sources and they are on the same rail.
 * `U2` (TPS2116) is a break-before-make mux: `C4` (22 µF) on `LDO_IN` is what holds the rail through the 8 µs handover, so place it **immediately at `U2.VOUT`**, not out with the LDO.
 * The battery protection (`U5` DW01A + `Q1` FS8205A) carries **full pack current**. `B−` and `GND` are separate nets joined only through `Q1` — keep that copper wide and short, and remember `Q1` pins 2/5 must stay soldered for thermal reasons even though they are the unconnected internal mid-node.
 
@@ -1289,13 +1318,15 @@ The chain is `J1 → F1 → D1 → USB_VBUS → {U11 TP4056, U2 TPS2116 VIN1}`, 
 
 ### 8.7 Before you route
 
-* ⬜ Decide `D1` (§6.20) — it changes the power-path footprint set
+* ✅ `D1` removed (§6.20) — power-path footprint set finalised
 * ⬜ Confirm the 13 caps still at 0805 (§6.19.3) are placed as 0805; the other 100 parts are now 0603
 * ⬜ Set up net classes with wider tracks for `P+`, `B−`, `GND`, `LDO_IN`, `3V3` and the `J2` HV rails before routing, not after
-* ⬜ `H1`–`H4` are all `MountingHole_Pad` tied to GND (§6.18) — if the enclosure ends up conductive, consider one solid and three isolated
+* ⬜ `H1`–`H5` are all `MountingHole_Pad` tied to GND (§6.18) — if the enclosure ends up conductive, consider one solid and the rest isolated
 * ⬜ Regenerate the BOM/netlist/gerbers; the committed artifacts are stale relative to the current schematic
 
 ### 8.8 What this section is not
 
-This is placement *guidance* derived from the schematic and the parts' datasheets. It has **not** been checked against a real layout, no DRC has been run, and no field solving or impedance calculation was performed. Treat §8 as a checklist to place against, then have the finished layout reviewed on its own terms.
+This is placement *guidance* derived from the schematic and the parts' datasheets — no field solving or impedance calculation was performed. Treat §8 as the checklist the layout was placed against.
+
+> **Update — layout now done.** The 2-layer layout has since been implemented and given a coordinate-level spot review: DRC is clean apart from cosmetic silkscreen, benign starved-GND thermals, and a rule-vs-connector clearance on `J1` (5 V USB pads at 0.15 mm vs the 0.20 mm `Power` class — resolve with a local override); board is fully routed (0 unconnected). The Wi-Fi antenna sits over a **board cutout** (no copper under it — correct). The USB pair is length-matched with minimal vias and only perpendicular crossings over the pour. Both switching nodes were tightened: the LED boost hot loop (`U10.VOUT→C9→GND`) with `C9` on-side and on-top, and the e-ink `EINK_SW` node collapsed from a plane to a compact node. Frontlight test points (`TP3`–`TP5`) were added. This remains a spot review, not a full sign-off — a formal layout/EMC review is still worthwhile before volume.
 

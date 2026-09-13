@@ -26,7 +26,7 @@ Successor to [de-link](https://de-link.me).
 > [`DESIGN_REVIEW.md`](../DESIGN_REVIEW.md).** This file describes the board *as it is*.
 >
 > Verified against `minRead_pcb.kicad_sch` / `minRead_pcb.pdf`, 2026-09-10.
-> 173 components, 127 nets, single A2 sheet.
+> 173 components, 126 nets, single A2 sheet.
 
 ---
 
@@ -82,7 +82,7 @@ gated on redesigning power and interface electronics every time.
 | Goal | Mechanism |
 |---|---|
 | **Display agnostic** | Standard 24-pin 0.5 mm ZIF (`J2`) carrying SPI + the full HV rail set. The panel's own controller drives the charge pump, so the board adapts to the panel rather than the reverse. |
-| **Case agnostic** | Four `MountingHole_Pad`s; no fixed button positions — buttons reach the outside world through connectors and a resistor-ladder scheme that costs only one pin per group. |
+| **Case agnostic** | Five `MountingHole_Pad`s; no fixed button positions — buttons reach the outside world through connectors and a resistor-ladder scheme that costs only one pin per group. |
 | **Firmware agnostic** | Nothing on the board requires a specific software stack. Every peripheral is a standard interface (SDMMC, SPI, I²C, ADC, native USB) with no board-specific handshake. |
 | **Battery agnostic** | Full DW01A + FS8205A protection on-board, so an **unprotected** bare LiPo is safe. A pack with its own protection also works — the two simply cascade. |
 
@@ -104,10 +104,10 @@ The whole design is a single A2 sheet. It divides into four domains:
 
 | Stage | Path |
 |---|---|
-| Input | USB-C → PPTC fuse → Schottky → `USB_VBUS` |
+| Input | USB-C → PPTC fuse → `USB_VBUS` |
 | Charging | `USB_VBUS` → TP4056 → `P+` (protected cell) |
 | Source select | TPS2116 picks `USB_VBUS` or `P+` → `LDO_IN` |
-| Regulation | `LDO_IN` → AP2112K → `3V3` (everything digital) |
+| Regulation | `LDO_IN` → TLV75533P → `3V3` (everything digital) |
 | Frontlight | `LDO_IN` → TPS923610 boost → up to 24.5 V (bypasses the LDO) |
 | Panel HV | `3V3` → charge pump driven by the panel → ±15–22 V |
 
@@ -142,12 +142,11 @@ connector.
 USB-C *sink*. A source detects those pull-downs and enables VBUS. Two separate 5.1 k
 resistors (not one shared) is correct — it lets the source determine cable orientation.
 
-**Input protection chain:** `VBUS_PRE → F1 → D1 → USB_VBUS`
+**Input protection chain:** `VBUS_PRE → F1 → USB_VBUS`
 
 - **`F1` `0805L100WR`** — 1.0 A hold / 1.95 A trip PPTC. Resettable overcurrent protection.
-- **`D1` B5819W** — Schottky blocking diode preventing back-feed into the connector.
 
-> ⚠️ **`D1` is under review for removal.** The design review ([DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §6.20) found it redundant: the TPS2116 specifies reverse leakage of **1 nA typ** out of an unselected input, and the TP4056 datasheet states outright that *"No blocking diode is required due to the internal PMOSFET architecture."* Both paths off `USB_VBUS` therefore already block. Meanwhile `D1` drops 0.3–0.6 V, and at the ~1 A `F1` will pass it exceeds its own SOD-123 500 mW rating. If it is removed in a later revision, this chain becomes `VBUS_PRE → F1 → USB_VBUS` and `R38` rises to 300 k.
+> **`D1` (the former series Schottky) has been removed.** The design review ([DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §6.20) found it redundant: the TPS2116 specifies reverse leakage of **1 nA typ** out of an unselected input, and the TP4056 datasheet states outright that *"No blocking diode is required due to the internal PMOSFET architecture."* Both paths off `USB_VBUS` already block. `D1` also dropped 0.3–0.6 V and, at the ~1 A `F1` passes, would have exceeded its own SOD-123 500 mW rating. With it gone, `F1` feeds `USB_VBUS` directly and `R38` was raised to 300 k (§3.4), recovering 0.3–0.6 V of headroom.
 
 **Shield handling:** `R1` (1 MΩ) ∥ `C1` (1 nF) from shell to GND. The classic arrangement —
 DC-isolates chassis from signal ground (breaking ground loops) while giving high-frequency
@@ -174,15 +173,16 @@ full-speed edges. **`CR1` `TSD05CDYFR`** clamps the VBUS rail itself.
 |---|---|---|
 | `VCC` (4) | `USB_VBUS` | charge only from USB |
 | `BAT` (5) | `P+` | charges the protected cell |
-| `PROG` (2) | `R6` = 12 kΩ | **I = 1200/12k = 100 mA** |
+| `PROG` (2) | `R6` = 4.7 kΩ | **I ≈ 1200/4.7k ≈ 255 mA** |
 | `TEMP` (1) | GND | NTC thermistor disabled (datasheet-sanctioned) |
 | `CE` (8) | `USB_VBUS` | always enabled when USB present |
 | `EPAD` (9) | GND | thermal path |
 
-**Why 100 mA?** Gentle. It suits packs from ~200 mAh upward and keeps dissipation trivial —
-`(5 V − 3.7 V) × 0.1 A` = 130 mW, about **+5 °C** in an ESOP-8 with thermal vias. For a
-device that spends most of its life asleep, slow charging costs nothing. Raising it later is
-a single resistor (`R6` = 4.7 k → ~255 mA).
+**Why ~255 mA?** `R6` = 4.7 kΩ sets the constant-current phase to roughly 255 mA (the
+datasheet constant is quoted as 1100–1200, so treat this as ~235–255 mA). Dissipation stays
+modest — `(5 V − 3.0 V) × 0.255 A` ≈ 500 mW worst case, about **+20 °C** in an ESOP-8 with
+thermal vias, well inside the part's thermal-regulation point. `R6` is the knob: a small
+300–500 mAh cell wants it left higher (`R6` = 12 kΩ ≈ 100 mA) to stay near 0.25C.
 
 **`CE` tied to `VCC`** means charging cannot be inhibited in firmware. That is a deliberate
 simplification: charging is automatic whenever USB is present.
@@ -253,13 +253,13 @@ DW01A can never disconnect it.
 | `PR1` (4) | `R38`/`R51` divider from `USB_VBUS` |
 | `ST` (8) | status → ladder |
 
-**Priority mode with a threshold divider.** `R38` = 240 k, `R51` = 100 k, `V_REF` = 1.00 V:
+**Priority mode with a threshold divider.** `R38` = 300 k, `R51` = 100 k, `V_REF` = 1.00 V:
 
 ```
-V_switchover = 1.00 V × (240k + 100k) / 100k = 3.40 V   (3.13–3.67 V worst case)
+V_switchover = 1.00 V × (300k + 100k) / 100k = 4.00 V   (3.68–4.32 V worst case)
 ```
 
-Above ~3.4 V on USB, the board runs from USB and the battery is untouched. Below it, the mux
+Above ~4.0 V on USB, the board runs from USB and the battery is untouched. Below it, the mux
 hands over to the cell. **Break-before-make** switching (8 µs) prevents the two sources
 shorting together; `C4` (22 µF) on the output holds the rail up across the gap.
 
@@ -276,15 +276,19 @@ battery genuinely rests while USB is present.
 
 ![LDO](images/03-ldo.png)
 
-**`U3` `AP2112K-3.3`** — 600 mA LDO, fixed 3.3 V.
+**`U3` `TLV75533PDBVR`** — 500 mA LDO, fixed 3.3 V, 25 µA quiescent. *(Replaces the original
+AP2112K-3.3; see [DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §6.23 for the battery-life rationale.
+Note the TLV75533P's pins 1/5 (OUT/IN) are swapped vs the AP2112K, so the footprint pin-map
+and `VIN`/`VOUT` routing were adjusted to suit.)*
 
 `EN` is tied to `VIN`, so the rail is **always live** whenever any source is present. There is
 no hardware off switch — "off" means ESP32 deep sleep. This is a deliberate simplification
 consistent with an e-paper device: the display holds its image with zero power, so "off" and
 "asleep" look identical to the user.
 
-Decoupling is generous: `C4` 22 µF in, and on the output `C6` 22 µF, `C32` 22 µF, `C10`/`C37`
-4.7 µF, plus a spread of 1 µF and 0.1 µF locals.
+Decoupling is generous: `C4` 22 µF in, and on the output `C6` 22 µF, `C32` 22 µF, `C10`
+4.7 µF, plus a spread of 1 µF and 0.1 µF locals. (`C37`, formerly on this rail, is now 1 µF on
+the switched `SD_VDD` rail — see [§5](#5-storage--4-bit-sdmmc).)
 
 **Note the frontlight boost does *not* run from 3V3** — it is fed from `LDO_IN`, upstream of
 the LDO. Boosting to 20 V from a rail that an LDO has already dropped would be a pointless
@@ -330,18 +334,27 @@ the resulting divider voltage identifies the state:
 
 | State | Asserted | `USB_STAT` |
 |---|---|---:|
-| USB present, charger idle | none | **3.30 V** |
-| Running on battery | ST | **1.98 V** |
+| Idle (USB healthy, charger between states) | none | **3.30 V** |
+| On battery (unplugged, or USB too weak to charge) | ST | **1.98 V** |
 | Charging | CHRG | **1.19 V** |
-| Charge complete | STDBY | **0.60 V** |
+| **Weak USB: charging while on battery** | ST + CHRG | **0.96 V** |
+| Charge complete (battery full) | STDBY | **0.60 V** |
 | No battery fitted (blinks) | CHRG + STDBY | **0.45 V** |
 
-Worst-case separation between adjacent states is 145 mV — comfortably decodable. Total ladder
-current is under 30 µA, matching the designer's annotation.
+Total ladder current is under 30 µA, and every state is separated by ≥ ~145 mV — all decodable
+against the ADC's ±30 mV.
 
-The values are chosen so that combinations which *could* be ambiguous are physically
-unreachable: the mux hands over at 3.4 V, below the TP4056's ~4.0 V operating minimum, so
-`ST` and `CHRG` can never assert together.
+**`ST` reports which input the mux picked, not whether a cable is attached** — it asserts
+whenever `USB_VBUS` drops below the mux switchover. So `ST`+`CHRG` is not a contradiction: it
+means **"USB is attached and charging, but too weak to run the load, so the load is on the
+battery."** With `D1` removed, `USB_VBUS` from a compliant source stays ≥ ~4.5 V even at 1 A —
+above the 4.32 V worst-case switchover — so the mux never leaves USB and this state never
+appears in normal use. It shows up **only with a marginal source** (a dying power bank, a
+high-resistance cable, a non-compliant charger), which makes 0.96 V a genuinely useful
+**"weak charger/cable" diagnostic** rather than a fault. Firmware should implement it as its own
+window (≈0.78–1.05 V) and flag the power source, rather than fold it into "charging." Full
+analysis, including why it can't be designed out without risking a brown-out, is in
+[DESIGN_REVIEW.md](../DESIGN_REVIEW.md) §2.1.
 
 The "no battery" state is a genuine TP4056 behaviour — with capacitance on `BAT` but no cell,
 it cycles between charge and termination, blinking `CHRG` at 1–4 s while `STDBY` stays low.
@@ -362,15 +375,17 @@ USB OTG peripheral, so there is **no CH340/CP2102 bridge** on this board. That r
 its power draw, and its driver headaches, and it enables USB Mass Storage (exposing the SD
 card to a host) and native DFU.
 
-### The `TP3`/`TP4`/`TP5` pads
+### `IO35`/`IO36`/`IO37` — the PSRAM pins
 
-`TP3`/`TP4`/`TP5` land on `IO37`/`IO36`/`IO35`. On an **octal-PSRAM** ESP32-S3 (the `R8`
-variants, including the `N8R8` fitted here) those three pins are consumed internally by the
-PSRAM bus and **must not be connected or probed**. On every other S3 variant — `N4`, `N8`,
-`N16`, and the quad-PSRAM `R2` parts — they are ordinary free GPIO.
+`IO37`/`IO36`/`IO35` are consumed internally by the PSRAM bus on **octal-PSRAM** ESP32-S3 parts
+(the `R8` variants, including the `N8R8` fitted here) and **must not be connected or probed**.
+On every other S3 variant — `N4`, `N8`, `N16`, and the quad-PSRAM `R2` parts — they are ordinary
+free GPIO.
 
-The pads therefore cost nothing on the current build and hand three extra IO to anyone who
-fits a non-octal module. Keep the stubs short and mark the restriction, so an `R8` build
+They are **not broken out** on this board — IO35–37 have no pads or vias. (The `TP3`–`TP5`
+designators exist, but they serve the frontlight driver, not these pins — see
+[§12](#12-test-points--mounting).) If a future revision wants to expose IO35–37 for non-octal
+builds, add short test pads and mark the restriction — keep the stubs short so an `R8` build
 cannot accidentally load a DDR PSRAM line.
 
 
@@ -464,7 +479,7 @@ avoid epd wakes when in deep sleep."* Without it, a floating reset line can let 
 self-wake, silently draining the battery.
 
 **Every panel rail is decoupled**, with the HV rails explicitly rated 50 V:
-`C13`–`C17` (4.7 µF/50 V), `C18`–`C20` (1 µF), `C22` (1 µF).
+`C13`–`C17` (4.7 µF/50 V), `C18`–`C20` (1 µF). *(`C22` is the RTC decoupling cap — see [§10](#10-real-time-clock) — not a panel rail.)*
 
 ### 6.2 Charge pump
 
@@ -819,16 +834,26 @@ implement its own regulation, rather than being limited by the LDO's remaining h
 
 ## 12. Test points & mounting
 
-`TP1` (`RX`) and `TP2` (`TX`) expose UART0 for serial debugging — useful even though
-programming happens over native USB, since the ROM bootloader and early boot messages come
-out on UART.
+Five test points are fitted:
 
-`TP3`/`TP4`/`TP5` are the `IO37`/`IO36`/`IO35` future-proofing pads described in
-[§4](#4-the-processor).
+| TP | Net | Purpose |
+|---|---|---|
+| `TP1` | `RX` | UART0 RX — ROM bootloader / early boot messages |
+| `TP2` | `TX` | UART0 TX — serial debug |
+| `TP3` | `LED_SW` | Frontlight boost output (probe the LED rail / software OVP) |
+| `TP4` | `C−` | Cool-string cathode return (frontlight bring-up / CCT tuning) |
+| `TP5` | `W−` | Warm-string cathode return |
+
+`TP1`/`TP2` are useful even though programming is over native USB, since boot messages come out
+on UART. `TP3`–`TP5` were added during the layout pass to make the frontlight driver measurable —
+handy for setting the current, checking the CCT blend, and confirming the boost output.
+
+`IO37`/`IO36`/`IO35` (the PSRAM pins on `R8` modules) are **not broken out** on this board —
+see [§4](#4-the-processor).
 
 ![Mounting](images/19-mounting.png)
 
-`H1`–`H4` are `MountingHole_Pad`s tied to GND — plated holes, so a metal standoff bonds the
+`H1`–`H5` are `MountingHole_Pad`s tied to GND — plated holes, so a metal standoff bonds the
 enclosure to ground.
 
 ---
@@ -864,7 +889,7 @@ Every ESP32-S3 pin, as used:
 | 25 | IO48 | — | EPD BUSY (via `R34`) |
 | 26 | IO45 | — | Spare → `J6` pin 3 |
 | 27 | IO0 | `ESP32_IO0` | Boot mode (SW6) |
-| 28–30 | IO35–37 | `IO3x_PSRAM` | Octal PSRAM on `R8` — free GPIO on other variants; `TP5`/`TP4`/`TP3` |
+| 28–30 | IO35–37 | `IO3x_PSRAM` | Octal PSRAM on `R8` — free GPIO on other variants; not broken out |
 | 31 | IO38 | `I2C_SDA` | I²C data |
 | 32 | IO39 | `I2C_SCL` | I²C clock |
 | 33 | IO40 | `COLOR_SEL` | Frontlight warm/cool |
@@ -895,7 +920,7 @@ a power-gated SD card, a 130 nA-shutdown LED driver, and a 100 k (not 10 k) rail
 e-paper device the display costs nothing to hold an image, so standby current *is* battery
 life.
 
-**3. Defense in depth on power.** PPTC → Schottky → TVS on the input; DW01A + FS8205A on the
+**3. Defense in depth on power.** PPTC → TVS on the input; DW01A + FS8205A on the
 cell; back-to-back FETs for reverse polarity; a priority mux that blocks reverse current.
 Any one of these could be argued away individually; together they make "bring your own
 battery" a safe proposition.
@@ -925,10 +950,10 @@ summary of the material changes rather than a commit-level changelog:
 |---|---|
 | **Accessory header** | Refined into the current 12-pin `J6`, grouped by voltage domain and fully ESD-protected |
 | **Power path** | Reworked around the TPS2116 priority mux; idle-current behaviour tightened throughout (high-value dividers, power-gated SD, 130 nA-shutdown LED driver) |
-| **Touch** | Added ? `J4` plus the `U7` ESD array and the 0 ? pin-swap jumpers |
-| **RTC** | Added ? `U13` DS3231MZ on the shared I?C bus |
+| **Touch** | Added — `J4` plus the `U7` ESD array and the 0 Ω pin-swap jumpers |
+| **RTC** | Added — `U13` DS3231MZ on the shared I²C bus |
 | **Frontlight** | Moved from the AP3012 to the TPS923610, gaining proper dimming control; the two colour-select GPIOs were replaced by one GPIO plus the `U12` inverter |
-| **ESD** | Expanded and refined ? now six arrays plus three rail clamps |
+| **ESD** | Expanded and refined — now six arrays plus three rail clamps |
 | **Charge reporting** | Added the `USB_STAT` resistor ladder for accurate charge-state detection |
 | **Mechanical** | The battery now sits in a cut-out *in* the PCB rather than stacked on top of it |
 
@@ -943,26 +968,27 @@ without a respin.
 Answers to questions that came up while documenting the board, recorded so they do not have to
 be rediscovered.
 
-**Sleep current target.** There is no numeric specification ? the goal is simply "as low as
-practical." Measured contributors total roughly 95 ?A, dominated by the LDO's own quiescent
-current (55 ?A). The board is designed so no *avoidable* load remains: the SD card is power
-gated, the LED driver drops to 130 nA, and every monitoring divider is 1 M?-class.
+**Sleep current target.** There is no numeric specification — the goal is simply "as low as
+practical." Measured contributors total roughly 65 µA. With the `TLV75533P` (25 µA quiescent)
+no single term dominates — the `USB_STAT` ladder (~13 µA) and the ESP32-S3 deep-sleep current
+(~13 µA) are now comparable to it. The board is designed so no *avoidable* load remains: the SD
+card is power gated, the LED driver drops to 130 nA, and every monitoring divider is 1 MΩ-class.
 
 **Enclosure.** The reference enclosure is 3D-printed, but the board is intended to be housed
 in anything. Two implications for a custom case:
 
-- The four `MountingHole_Pad`s are **plated and GND-connected**, so a conductive enclosure
+- The five `MountingHole_Pad`s are **plated and GND-connected**, so a conductive enclosure
   (CNC aluminium, for example) will be bonded to signal ground through the standoffs. That is
-  usually desirable for EMC, but it should be a deliberate choice ? use one bonded standoff and
+  usually desirable for EMC, but it should be a deliberate choice — use one bonded standoff and
   three isolated ones if a ground loop through the chassis is a concern.
 - A conductive case must not bridge the exposed high-voltage nets. `LED_SW` (up to 24.5 V) and
-  the panel's ?22 V rails are the ones to keep clear of any metalwork.
+  the panel's ±22 V rails are the ones to keep clear of any metalwork.
 
-**Frontlight load.** The GDEQ bonded frontlights are V_f ? 15 V at I_f ? 15 mA per channel;
-`R37` = 13.3 ? sets exactly 15.0 mA at full `ADIM` duty.
+**Frontlight load.** The GDEQ bonded frontlights are V_f ≈ 15 V at I_f ≈ 15 mA per channel;
+`R37` = 13.3 Ω sets exactly 15.0 mA at full `ADIM` duty.
 
 **Button geometry.** Bottom edge, left-to-right facing the screen:
-BACK ? CONFIRM ? LEFT ? RIGHT. Sides: UP(1)/DOWN(1) on the right edge, UP(2)/DOWN(2) on the
+BACK · CONFIRM · LEFT · RIGHT. Sides: UP(1)/DOWN(1) on the right edge, UP(2)/DOWN(2) on the
 left edge.
 
 ---
@@ -975,11 +1001,11 @@ left edge.
 | Capacitors | 35 | 22× **0603**, 13× **0805** (HV / bulk — see below); 7× 50 V-rated |
 | ICs | 13 | see below |
 | Switches | 11 | 8 ladder + power + reset + boot |
-| Diodes | 7 | 4× B5819W, SMAJ26A, PESD2IVN-UX, LED |
+| Diodes | 6 | 3× B5819W, SMAJ26A, PESD2IVN-UX, LED |
 | Connectors | 7 | USB-C, 24p ZIF, 2× 6p ZIF, microSD, JST-PH, 2×6 header |
 | Transistors | 7 | 3× AO3419, 3× BSS138, FS8205A |
-| Test points | 5 | UART ×2, PSRAM-future ×3 |
-| Mounting | 4 | plated, GND |
+| Test points | 5 | UART RX/TX (`TP1`/`TP2`) + frontlight `LED_SW`/`C−`/`W−` (`TP3`–`TP5`) |
+| Mounting | 5 | plated, GND |
 | TVS | 3 | TSD05CDYFR |
 | Inductors | 2 | 22 µH (charge pump), 4.7 µH (frontlight) |
 | Fuse | 1 | 0805L100WR PPTC (0805) |
@@ -1002,7 +1028,7 @@ left edge.
 |---|---|---|
 | `U1`, `U6`–`U9` | TPD4E1U06DBVR | ESD arrays (SD data, USB, touch, expansion, SD clk/cmd) |
 | `U2` | TPS2116DRL | Power-path mux |
-| `U3` | AP2112K-3.3 | 3.3 V LDO |
+| `U3` | TLV75533PDBVR | 3.3 V LDO |
 | `U4` | ESP32-S3-WROOM-1 | Processor |
 | `U5` | DW01A | Cell protection controller |
 | `U10` | TPS923610DRLR | Frontlight boost driver |
