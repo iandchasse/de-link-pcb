@@ -343,7 +343,7 @@ The converter runs deep in **DCM** at this power level (ΔI_L is 4–6× I_in), 
 
 Residual note (layout, not schematic): 550 mA pk-pk of triangular ripple at 1.1 MHz is a meaningful radiator on a 2-layer board. Keep the `L2`/`C12`/`C9` loop tight.
 
-*(Minor: the MPN as written, `74479325207247`, is 14 digits — Würth WE-series numbers are normally 11. Worth eyeballing the digits before it goes into the BOM.)*
+*(MPN confirmed: `74479325207247` — Würth Elektronik WE-LQS 4.7 µH, 1008.)*
 
 ### 3.5.1 ⬜ **OUTSTANDING** — `L1` (22 µH, `NR3015T220MNGH`) is NRND and needs a replacement
 

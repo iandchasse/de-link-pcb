@@ -59,7 +59,7 @@ Add the off-board items below for a complete unit. Excludes 5 mounting holes and
 | Qty | Refs | Value | MPN | Mfr | LCSC alt | Unit | Ext | src | Buy | Notes |
 |--:|---|---|---|---|---|--:|--:|:--:|---|---|
 | 1 | L1 | 22u | VLS3012HBX-220M | TDK | — | ~$0.50 | $0.50 | est | [DK](https://www.digikey.com/en/products/result?keywords=VLS3012HBX-220M) | 22uH shielded |
-| 1 | L2 | 4.7u | 4.7uH 1008 | Wurth | — | ~$0.30 | $0.30 | est | [DK](https://www.digikey.com/en/products/result?keywords=4.7uH%201008) | VERIFY exact MPN |
+| 1 | L2 | 4.7u | 74479325207247 | Wurth Elektronik | — | ~$0.30 | $0.30 | est | [DK](https://www.digikey.com/en/products/result?keywords=74479325207247) | 4.7uH WE-LQS 1008 |
 
 ## Fuse
 
@@ -134,6 +134,6 @@ Add the off-board items below for a complete unit. Excludes 5 mounting holes and
 
 - **LCSC-cheaper / alternates:** buttons `MJTP1117` → **SKHLLAA010 / TS365ZJ**; JST `S2B-PH-K-S` → **A2001WR-2P**; header `PPPC062LJBN-RC` → **A2541HWR-2x6P** (if PPPC is out of stock at LCSC).
 - **LCSC-only** (not DigiKey): `DW01A` (C8724), `TP4056` (C382139), `FS8205A` (C32254). `DS3231MZ` genuine is pricey (~$5–8); LCSC clones are ~$1–2.
-- **Verify before ordering:** `L2` 4.7 µH exact MPN; `J1` USB4085 suffix; `U4` = **N8R8**; `B5819W` DigiKey equiv `1N5819HW-7-F`.
+- **Verify before ordering:** `J1` USB4085 suffix; `U4` = **N8R8**; `B5819W` DigiKey equiv `1N5819HW-7-F`.
 - **DNP** (excluded from assembly): `R43 R45 R58 R66 R72 R74`.
 - `est` prices are placeholders for parts changed since the sourcing sheet was made (TLV75533P, TPS923610, TP4056, TPS2116, VLS3012HBX, SMAJ26A, PESD2IVN, DS3231MZ, LED, fuse, switches) — confirm at the links.

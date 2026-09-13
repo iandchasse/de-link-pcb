@@ -807,7 +807,7 @@
       "gencad": "",
       "idf": "silkscreen_pcb.emn",
       "netlist": "",
-      "plot": "gerbers/",
+      "plot": "docs/",
       "pos_files": "placement/",
       "specctra_dsn": "",
       "step": "delink_pcb_0806.step",
@@ -1028,7 +1028,7 @@
       "workbook_filename": ""
     },
     "page_layout_descr_file": "",
-    "plot_directory": "./",
+    "plot_directory": "docs/",
     "space_save_all_events": true,
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",

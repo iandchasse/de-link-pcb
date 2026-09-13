@@ -27,6 +27,11 @@ Successor to [de-link](https://de-link.me).
 >
 > Verified against `silkscreen_pcb.kicad_sch` / `silkscreen_pcb.pdf`, 2026-09-10.
 > 173 components, 126 nets, single A2 sheet.
+>
+> **Current full plots:** [`silkscreen_pcb_schematic.pdf`](silkscreen_pcb_schematic.pdf)
+> (schematic) and [`silkscreen_pcb.pdf`](silkscreen_pcb.pdf) (PCB) are the authoritative,
+> up-to-date views. The per-block screenshots in `images/` below are illustrative and may lag
+> the latest revision — regenerate them from KiCad if a block looks out of date.
 
 ---
 
