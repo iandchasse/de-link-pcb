@@ -4,6 +4,16 @@
 	(generator_version "9.0")
 	(uuid "2fbd4c8f-b784-4d80-b374-4947df99a9bf")
 	(paper "A2")
+	(title_block
+		(title "Silkscreen Reader PCB")
+		(date "2026-09-12")
+		(rev "1.0")
+		(company "idc LLC")
+		(comment 1 "Open-hardware e-reader base board")
+		(comment 2 "Licensed under CERN-OHL-S-2.0")
+		(comment 3 "© 2026 idc LLC")
+		(comment 4 "github.com/iandchasse/silkscreen-pcb")
+	)
 	(lib_symbols
 		(symbol "74xGxx:74LVC1G04"
 			(exclude_from_sim no)
