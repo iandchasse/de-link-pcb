@@ -94,7 +94,7 @@ links, LCSC-cheaper alternates, and per-part pricing with quantity break costs (
 Hardware licensed under the **CERN Open Hardware Licence Version 2 – Strongly Reciprocal
 (CERN-OHL-S-2.0)** — see [LICENSE](LICENSE).
 
-> Copyright © Ian Chasse.
+> Copyright © 2026 idc LLC.
 > This source describes Open Hardware and is licensed under the CERN-OHL-S v2.
 > You may redistribute and modify this source and make products using it under the terms of the
 > CERN-OHL-S v2 (https://ohwr.org/cern_ohl_s_v2.txt). This source is distributed WITHOUT ANY

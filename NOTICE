@@ -1,0 +1,30 @@
+Silkscreen — open-hardware e-reader base board
+
+Copyright © 2026 idc LLC.
+
+This source describes Open Hardware and is licensed under the CERN-OHL-S v2.
+
+You may redistribute and modify this source and make products using it under the
+terms of the CERN Open Hardware Licence Version 2 - Strongly Reciprocal
+(CERN-OHL-S v2, https://ohwr.org/cern_ohl_s_v2.txt; full text in ./LICENSE).
+
+This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY, INCLUDING OF
+MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
+Please see the CERN-OHL-S v2 for applicable conditions.
+
+Source location: https://github.com/iandchasse/silkscreen-pcb
+
+SPDX-License-Identifier: CERN-OHL-S-2.0
+
+-------------------------------------------------------------------------------
+
+Third-party content (NOT covered by the license above):
+
+- Component library files (symbols, footprints, 3D models) under
+  KiCad/9.0/3rdparty/ were obtained from SnapEDA, Ultra Librarian and
+  SamacSys / Component Search Engine. They retain their respective vendors'
+  licenses. See fabrication/THIRD_PARTY.md for the part list, sources and
+  re-download links.
+
+- All other library content uses the KiCad standard libraries, licensed
+  CC-BY-SA-4.0 with the KiCad library exception.
