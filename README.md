@@ -103,4 +103,8 @@ Hardware licensed under the **CERN Open Hardware Licence Version 2 – Strongly 
 
 `SPDX-License-Identifier: CERN-OHL-S-2.0`
 
+Third-party component library files (from SnapEDA / Ultra Librarian / SamacSys) retain their own
+terms and are not covered by the project license — see
+[fabrication/THIRD_PARTY.md](fabrication/THIRD_PARTY.md).
+
 Predecessor project: [de-link.me](https://de-link.me).

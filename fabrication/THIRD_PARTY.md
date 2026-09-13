@@ -1,0 +1,41 @@
+# Third-party library files
+
+The board **design** in this repository (schematic and PCB) is licensed **CERN-OHL-S-2.0**
+(see [`../LICENSE`](../LICENSE)). A handful of component **library files** — symbols, footprints
+and 3D models under `KiCad/9.0/3rdparty/` — were obtained from **SnapEDA**, **Ultra Librarian**
+and **SamacSys / Component Search Engine**.
+
+**What that means for licensing:**
+- ✅ All three vendors permit *using* these parts in a design and distributing the resulting
+  **board design under any license** — so the CERN-OHL-S license on this project is unaffected,
+  and you may fabricate, use, sell and modify boards made from it.
+- ⚠️ All three **restrict redistributing the raw model files** as a standalone, reusable PCB
+  library. They are included here only for build convenience. **If you fork or redistribute this
+  repo as a component library, re-download each part from its vendor** (links below).
+- The board also builds without these files: symbols are cached in `silkscreen_pcb.kicad_sch`
+  and footprints are embedded in `silkscreen_pcb.kicad_pcb`, so you can regenerate fab data even
+  if the `3rdparty/` folder is absent.
+- Manufacturer 3D STEP models (e.g. Hirose, TI) carry their own manufacturer terms.
+- Everything else in the design uses **KiCad's standard libraries** (CC-BY-SA-4.0 with the
+  library exception — freely redistributable).
+
+## Vendored parts
+
+| MPN | Ref(s) | Files provided | Source | Re-download |
+|---|---|---|---|---|
+| FH34SRJ-24S-0.5SH(50) | J2 | symbol, footprint, 3D | SnapEDA | https://www.snapeda.com/search/?q=FH34SRJ-24S-0.5SH |
+| FH34SRJ-6S-0.5SH(50) | J3, J4 | symbol, footprint, 3D | SnapEDA | https://www.snapeda.com/search/?q=FH34SRJ-6S-0.5SH |
+| PPPC062LJBN-RC | J6 | symbol, footprint | SnapEDA | https://www.snapeda.com/search/?q=PPPC062LJBN-RC |
+| TPD4E1U06DBVR | U1, U6–U9 | symbol, footprint, 3D | SnapEDA | https://www.snapeda.com/search/?q=TPD4E1U06DBVR |
+| TSD05CDYFR | CR1–CR3 | symbol, footprint | SnapEDA | https://www.snapeda.com/search/?q=TSD05CDYFR |
+| SRN3010C-100M | L1 (footprint) | footprint, 3D | SnapEDA | https://www.snapeda.com/search/?q=SRN3010C-100M |
+| FS8205A | Q1 | symbol, footprint | Ultra Librarian | https://app.ultralibrarian.com/search?queryText=FS8205A |
+| TPS923610DRLR | U10 | symbol, footprint | Ultra Librarian | https://app.ultralibrarian.com/search?queryText=TPS923610DRLR |
+| MJTP1117 | SW1–SW5, SW7–SW11 (footprint) | footprint | SamacSys / Component Search Engine | https://componentsearchengine.com/search?term=MJTP1117 |
+
+Notes:
+- `SRN3010C-100M` and `MJTP1117` contribute only the **footprint**; their symbols are KiCad
+  standard (`Device:L`, `Switch:SW_Push`). `SW6` uses a KiCad-standard MJTP1243 footprint.
+- `J1` (USB-C), `J7` (microSD), and every passive/IC not listed above use **standard KiCad
+  libraries** — no third-party terms apply.
+- `TPS923610DRLR`'s 3D model (`SOT563.STEP`) is the manufacturer's, added separately.
